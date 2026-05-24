@@ -67,7 +67,7 @@ const RecognizedOrganizations = () => {
                 Student & Faculty Groups
               </div>
 
-              <h1 className="mt-8 whitespace-nowrap text-[clamp(1.5rem,7.5vw,6rem)] font-bold leading-[0.96] tracking-tight sm:text-[clamp(2.25rem,7.5vw,6rem)]">
+              <h1 className="mt-8 text-balance text-[clamp(1.5rem,7.5vw,6rem)] font-bold leading-[0.96] tracking-tight sm:text-[clamp(2.25rem,7.5vw,6rem)]">
                 Recognized Organizations
               </h1>
 
@@ -92,7 +92,7 @@ const RecognizedOrganizations = () => {
               </p>
             </div>
 
-            <div className="grid min-w-full grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[520px]">
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                   <Building2 size={18} />
@@ -191,8 +191,8 @@ const RecognizedOrganizations = () => {
             </button>
 
             <div className="grid overflow-y-auto lg:grid-cols-[minmax(0,1fr)_380px]">
-              <div className="min-h-[520px] bg-white p-5 md:p-8">
-                <div className="flex h-full min-h-[480px] items-center justify-center overflow-hidden rounded-[1.5rem] border border-gray-200 bg-[#fbfbfa]">
+              <div className="min-h-0 bg-white p-5 md:min-h-[520px] md:p-8">
+                <div className="flex h-full min-h-[240px] items-center justify-center overflow-hidden rounded-[1.5rem] border border-gray-200 bg-[#fbfbfa] sm:min-h-[320px] md:min-h-[480px]">
                   <img 
                     src={resolveImageUrl(selectedRecord, 'chart')} 
                     alt={`${selectedRecord.org_name} Chart`} 

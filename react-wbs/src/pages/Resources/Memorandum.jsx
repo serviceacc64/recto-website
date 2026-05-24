@@ -78,7 +78,7 @@ const Memorandum = ({ tableName, title }) => {
                 Official Records Bureau
               </div>
 
-              <h1 className="mt-8 whitespace-nowrap text-[clamp(1.5rem,7.5vw,6rem)] font-bold leading-[0.96] tracking-tight sm:text-[clamp(2.25rem,7.5vw,6rem)]">
+              <h1 className="mt-8 text-balance text-[clamp(1.5rem,7.5vw,6rem)] font-bold leading-[0.96] tracking-tight sm:text-[clamp(2.25rem,7.5vw,6rem)]">
                 {title}
               </h1>
 
@@ -103,7 +103,7 @@ const Memorandum = ({ tableName, title }) => {
               </p>
             </div>
 
-            <div className="grid min-w-full grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[520px]">
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                   <Archive size={18} />
@@ -166,7 +166,60 @@ const Memorandum = ({ tableName, title }) => {
           </div>
 
           <div className="overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5">
-            <div className="overflow-x-auto">
+            {/* Mobile / tablet card layout */}
+            <div className="divide-y divide-gray-100 md:hidden">
+              {loading ? (
+                [1, 2, 3].map((i) => (
+                  <div key={i} className="animate-pulse space-y-4 p-5">
+                    <div className="h-4 w-24 rounded bg-gray-100" />
+                    <div className="h-6 w-full rounded bg-gray-100" />
+                    <div className="h-12 w-full rounded bg-gray-100" />
+                  </div>
+                ))
+              ) : paginatedRecords.length > 0 ? (
+                paginatedRecords.map((record) => (
+                  <article key={record.id} className="space-y-4 p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
+                        <Calendar size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-gray-950">
+                          {record.date ? new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                        </p>
+                        <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Official Registry</p>
+                      </div>
+                    </div>
+                    <h3 className="text-base font-bold leading-6 text-gray-950">{record.title}</h3>
+                    <p className="text-sm font-medium leading-6 text-gray-500 line-clamp-3">
+                      {record.description || 'Institutional documentation without supplementary archival narrative.'}
+                    </p>
+                    {record.file ? (
+                      <a
+                        href={record.file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-h-11 w-full items-center justify-center gap-3 rounded-full bg-gray-950 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-800 sm:w-auto"
+                      >
+                        <FileText size={15} />
+                        Open
+                        <ArrowDownToLine size={14} />
+                      </a>
+                    ) : (
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-gray-300">Physical Vault</span>
+                    )}
+                  </article>
+                ))
+              ) : (
+                <div className="px-6 py-20 text-center">
+                  <Archive size={40} className="mx-auto mb-5 text-gray-300" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">No matching records found in the {title} archives.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-gray-950 text-[10px] font-bold uppercase tracking-[0.28em] text-white">
@@ -186,7 +239,7 @@ const Memorandum = ({ tableName, title }) => {
                   ) : paginatedRecords.length > 0 ? (
                     paginatedRecords.map((record) => (
                       <tr key={record.id} className="transition-colors hover:bg-maroon-50/30">
-                        <td className="whitespace-nowrap px-6 py-6">
+                        <td className="px-6 py-6">
                           <div className="flex items-center gap-4">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                               <Calendar size={18} />
@@ -209,7 +262,7 @@ const Memorandum = ({ tableName, title }) => {
                         </td>
                         <td className="px-6 py-6 text-right">
                           {record.file ? (
-                            <a href={record.file} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 rounded-full bg-gray-950 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-800">
+                            <a href={record.file} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-3 rounded-full bg-gray-950 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-800">
                               <FileText size={15} />
                               Open
                               <ArrowDownToLine size={14} />

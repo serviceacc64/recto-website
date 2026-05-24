@@ -91,7 +91,7 @@ const Location = () => {
                 Geographic Location
               </div>
 
-              <h1 className="mt-6 whitespace-nowrap text-[clamp(1.5rem,7.5vw,6rem)] font-bold leading-[0.96] tracking-tight sm:text-[clamp(2.25rem,7.5vw,6rem)]">
+              <h1 className="mt-6 text-balance text-[clamp(1.5rem,7.5vw,6rem)] font-bold leading-[0.96] tracking-tight sm:text-[clamp(2.25rem,7.5vw,6rem)]">
                 Campus Location
               </h1>
 
@@ -182,7 +182,7 @@ const Location = () => {
               </p>
             </div>
 
-            <div className="grid min-w-full grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[520px]">
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                   <MapPin size={18} />
@@ -276,7 +276,7 @@ const Location = () => {
                   </div>
                 </div>
 
-                <div className="h-[500px] overflow-hidden rounded-[1.25rem] border border-gray-100 bg-[#fbfbfa] xl:h-[620px]">
+                <div className="h-[320px] overflow-hidden rounded-[1.25rem] border border-gray-100 bg-[#fbfbfa] sm:h-[400px] md:h-[500px] xl:h-[620px]">
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15485.45717320015!2d121.312918!3d13.931448!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd455555555555%3A0x7d7d7d7d7d7d7d7d!2sRecto%20Memorial%20National%20High%20School!5e0!3m2!1sen!2sph!4v1715560000000!5m2!1sen!2sph"
                     width="100%"

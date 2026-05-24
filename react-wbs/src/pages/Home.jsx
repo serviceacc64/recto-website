@@ -173,7 +173,7 @@ const Home = () => {
     <main className="flex w-full flex-col overflow-x-hidden bg-[#f7f7f5] font-outfit text-gray-950">
       
       {/* Cinematic Hero Section */}
-      <section className="relative h-screen w-full overflow-hidden bg-black">
+      <section className="relative h-[85dvh] min-h-[480px] w-full overflow-hidden bg-black sm:h-[90dvh] lg:h-screen">
         {/* Carousel Background */}
         <div className="absolute inset-0 z-0">
           {slides.map((slide, index) => (
@@ -245,7 +245,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="grid min-w-full grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[520px]">
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                   <Megaphone size={18} />
@@ -310,7 +310,7 @@ const Home = () => {
               </p>
             </div>
 
-            <div className="grid min-w-full grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[520px]">
+            <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-black/5 bg-[#fbfbfa] p-4 shadow-sm">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                   <Newspaper size={18} />
@@ -382,7 +382,6 @@ const Home = () => {
                     id="mainVideo"
                     title={selectedVideo.title}
                     width="100%"
-                    height="500"
                     src={toEmbedUrl(selectedVideo.video_url || selectedVideo.embedUrl)}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -459,41 +458,41 @@ const Home = () => {
                <p className="max-w-xl text-sm leading-6 text-gray-500">Providing a conducive learning environment equipped with laboratories and recreation areas.</p>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-12 md:h-[820px]">
-               <div className="group relative overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-8">
-                  <img src={speechlabImg} alt="Speech Lab" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
+               <div className="group relative min-h-[280px] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-8 md:min-h-[360px] lg:min-h-[420px]">
+                  <img src={speechlabImg} alt="Speech Lab" className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-12 left-12 text-white">
+                  <div className="absolute bottom-6 left-6 right-6 text-white sm:bottom-10 sm:left-10 sm:right-10">
                      <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">01</span>
-                     <h3 className="text-4xl font-bold mt-2 italic">Speech Laboratory</h3>
-                     <p className="text-white/70 mt-2 max-w-sm">Enhancing linguistic skills with advanced audio-visual equipment.</p>
+                     <h3 className="mt-2 text-2xl font-bold italic sm:text-3xl lg:text-4xl">Speech Laboratory</h3>
+                     <p className="mt-2 max-w-sm text-sm text-white/70 sm:text-base">Enhancing linguistic skills with advanced audio-visual equipment.</p>
                   </div>
                </div>
 
-               <div className="group relative overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-4">
-                  <img src={comlabImg} alt="Computer Lab" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+               <div className="group relative min-h-[220px] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-4 md:min-h-[280px]">
+                  <img src={comlabImg} alt="Computer Lab" className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-10 left-10 text-white">
+                  <div className="absolute bottom-6 left-6 right-6 text-white sm:bottom-10 sm:left-10">
                      <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">02</span>
-                     <h3 className="text-3xl font-bold mt-2 italic">ICT Center</h3>
+                     <h3 className="mt-2 text-xl font-bold italic sm:text-2xl lg:text-3xl">ICT Center</h3>
                   </div>
                </div>
 
-               <div className="group relative overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-5">
-                  <img src={coveredcourtImg} alt="Court" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+               <div className="group relative min-h-[220px] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-5 md:min-h-[280px]">
+                  <img src={coveredcourtImg} alt="Court" className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-10 left-10 text-white">
+                  <div className="absolute bottom-6 left-6 right-6 text-white sm:bottom-10 sm:left-10">
                      <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">03</span>
-                     <h3 className="text-3xl font-bold mt-2 italic">Covered Court</h3>
+                     <h3 className="mt-2 text-xl font-bold italic sm:text-2xl lg:text-3xl">Covered Court</h3>
                   </div>
                </div>
 
-               <div className="group relative overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-7">
-                  <img src={makingImg} alt="Innovation" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+               <div className="group relative min-h-[260px] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-7 md:min-h-[320px]">
+                  <img src={makingImg} alt="Innovation" className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-1000" />
                   <div className="absolute inset-0 bg-gradient-to-t from-maroon-900/40 to-transparent"></div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-12">
-                     <h3 className="text-5xl font-bold text-white tracking-tighter italic">Innovating Education for the Future.</h3>
-                     <button className="mt-8 inline-flex items-center gap-3 rounded-full bg-maroon-800 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-900">Explore More <ArrowRight size={18} /></button>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center sm:p-10 lg:p-12">
+                     <h3 className="text-2xl font-bold tracking-tighter text-white italic sm:text-3xl lg:text-5xl">Innovating Education for the Future.</h3>
+                     <button type="button" className="mt-6 inline-flex min-h-11 items-center gap-3 rounded-full bg-maroon-800 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-900 sm:mt-8">Explore More <ArrowRight size={18} /></button>
                   </div>
                </div>
             </div>
