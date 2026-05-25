@@ -92,16 +92,17 @@ const AdminRecognizedOrgs = () => {
     setPdfFile(null);
   };
 
-  const getDateInputValue = (dateValue) => {
+  const getEstablishedYear = (dateValue) => {
     if (!dateValue) return '';
-    return String(dateValue).split('T')[0];
+    const year = new Date(dateValue).getFullYear();
+    return Number.isNaN(year) ? '' : String(year);
   };
 
   const handleEdit = (record) => {
     setEditingId(record.id);
     setOrgName(record.org_name || '');
     setAdviserName(record.adviser_name || '');
-    setDateEstablished(getDateInputValue(record.date_established));
+    setDateEstablished(getEstablishedYear(record.date_established));
     setLogoFile(null);
     setChartFile(null);
     setPdfFile(null);
@@ -119,7 +120,7 @@ const AdminRecognizedOrgs = () => {
       const payload = {
         org_name: orgName,
         adviser_name: adviserName,
-        date_established: dateEstablished
+        date_established: `${dateEstablished}-01-01`
       };
 
       if (logoUrl) payload.logo_url = logoUrl;
@@ -156,11 +157,7 @@ const AdminRecognizedOrgs = () => {
   const formatEstablishedDate = (dateValue) => {
     if (!dateValue) return '--';
 
-    return new Date(dateValue).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return getEstablishedYear(dateValue) || '--';
   };
 
   return (
@@ -268,12 +265,17 @@ const AdminRecognizedOrgs = () => {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">Establishment Date</label>
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">Establishment Year</label>
                     <input
-                      type="date"
+                      type="number"
                       required
+                      min="1900"
+                      max="2099"
+                      inputMode="numeric"
+                      pattern="[0-9]{4}"
                       value={dateEstablished}
                       onChange={(e) => setDateEstablished(e.target.value)}
+                      placeholder="e.g. 2018"
                       className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none transition focus:border-maroon-200 focus:ring-4 focus:ring-maroon-50"
                     />
                   </div>
@@ -429,7 +431,7 @@ const AdminRecognizedOrgs = () => {
                                 </div>
                                 <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-500">
                                   <Calendar size={14} className="text-maroon-800" />
-                                  {new Date(record.date_established).getFullYear() || '--'}
+                                  {formatEstablishedDate(record.date_established)}
                                 </div>
                                 {record.pdf_url && (
                                   <a
