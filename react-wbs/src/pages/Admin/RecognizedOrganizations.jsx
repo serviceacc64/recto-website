@@ -28,7 +28,7 @@ const AdminRecognizedOrgs = () => {
   const [dateEstablished, setDateEstablished] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [chartFile, setChartFile] = useState(null);
-  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfFiles, setPdfFiles] = useState([]);
 
   const queryRecords = useCallback(async () => {
     const { data, error } = await supabase
@@ -75,11 +75,27 @@ const AdminRecognizedOrgs = () => {
   const handleUpload = async (file, bucket) => {
     if (!file) return null;
     const fileExt = file.name.split('.').pop();
-    const fileName = `${bucket}-${Date.now()}.${fileExt}`;
+    const safeBaseName = file.name
+      .replace(/\.[^/.]+$/, '')
+      .replace(/[^a-z0-9-]+/gi, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase() || 'file';
+    const fileName = `${bucket}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeBaseName}.${fileExt}`;
     const { error } = await supabase.storage.from(bucket).upload(fileName, file);
     if (error) throw error;
     const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(fileName);
     return publicUrl;
+  };
+
+  const handleUploadMany = async (files, bucket) => {
+    if (!files.length) return [];
+
+    return Promise.all(
+      files.map(async (file) => ({
+        name: file.name,
+        url: await handleUpload(file, bucket)
+      }))
+    );
   };
 
   const resetForm = () => {
@@ -89,7 +105,7 @@ const AdminRecognizedOrgs = () => {
     setDateEstablished('');
     setLogoFile(null);
     setChartFile(null);
-    setPdfFile(null);
+    setPdfFiles([]);
   };
 
   const getEstablishedYear = (dateValue) => {
@@ -105,7 +121,7 @@ const AdminRecognizedOrgs = () => {
     setDateEstablished(getEstablishedYear(record.date_established));
     setLogoFile(null);
     setChartFile(null);
-    setPdfFile(null);
+    setPdfFiles([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -115,7 +131,7 @@ const AdminRecognizedOrgs = () => {
     try {
       const logoUrl = await handleUpload(logoFile, 'org-logos');
       const chartUrl = await handleUpload(chartFile, 'org-charts');
-      const pdfUrl = await handleUpload(pdfFile, 'compliance-reports');
+      const uploadedPdfs = await handleUploadMany(pdfFiles, 'compliance-reports');
 
       const payload = {
         org_name: orgName,
@@ -125,7 +141,16 @@ const AdminRecognizedOrgs = () => {
 
       if (logoUrl) payload.logo_url = logoUrl;
       if (chartUrl) payload.chart_url = chartUrl;
-      if (pdfUrl) payload.pdf_url = pdfUrl;
+      if (uploadedPdfs.length > 0) {
+        const currentPdfEntries = editingId
+          ? getPdfEntries(records.find((record) => record.id === editingId) || {})
+          : [];
+        const allPdfs = [...currentPdfEntries, ...uploadedPdfs];
+
+        payload.pdf_urls = allPdfs.map((file) => file.url);
+        payload.pdf_names = allPdfs.map((file) => file.name);
+        payload.pdf_url = allPdfs[0].url;
+      }
 
       const { error } = editingId
         ? await supabase.from('recognized-structure').update(payload).eq('id', editingId)
@@ -154,6 +179,31 @@ const AdminRecognizedOrgs = () => {
 
   const withLogoCount = records.filter((record) => record.logo_url).length;
   const withChartCount = records.filter((record) => record.chart_url).length;
+  const getPdfEntries = (record) => {
+    const urls = record.pdf_urls || [];
+    const names = record.pdf_names || [];
+
+    if (urls.length > 0) {
+      return urls.map((url, index) => ({
+        url,
+        name: names[index] || `Compliance PDF ${index + 1}`
+      }));
+    }
+
+    return record.pdf_url ? [{ url: record.pdf_url, name: 'Compliance PDF' }] : [];
+  };
+
+  const selectedPdfLabel = pdfFiles.length === 0
+    ? editingId
+      ? 'Choose PDFs to add'
+      : 'No PDFs chosen'
+    : pdfFiles.length === 1
+      ? pdfFiles[0].name
+      : `${pdfFiles.length} PDFs selected`;
+  const editingPdfEntries = editingId
+    ? getPdfEntries(records.find((record) => record.id === editingId) || {})
+    : [];
+
   const formatEstablishedDate = (dateValue) => {
     if (!dateValue) return '--';
 
@@ -233,8 +283,8 @@ const AdminRecognizedOrgs = () => {
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-gray-500">
                       {editingId
-                        ? 'Update the selected organization record. Existing images stay unchanged unless replaced.'
-                        : 'Add a recognized organization with its adviser, logo, and structure chart.'}
+                        ? 'Update the selected organization record. Existing files stay attached when new PDFs are added.'
+                        : 'Add a recognized organization with its adviser, logo, structure chart, and compliance files.'}
                     </p>
                   </div>
                 </div>
@@ -321,12 +371,46 @@ const AdminRecognizedOrgs = () => {
                       </div>
                       <div className="min-w-0 text-left">
                         <span className="block truncate text-sm font-semibold text-gray-700">
-                          {pdfFile ? pdfFile.name : 'No PDF chosen'}
+                          {selectedPdfLabel}
                         </span>
-                        <span className="mt-0.5 block text-xs text-gray-400">Compliance report, accreditation certificate, or recognition document (PDF)</span>
+                        <span className="mt-0.5 block text-xs text-gray-400">Compliance reports, accreditation certificates, or recognition documents (PDF)</span>
                       </div>
-                      <input type="file" className="hidden" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="application/pdf"
+                        multiple
+                        onChange={(e) => setPdfFiles(Array.from(e.target.files || []))}
+                      />
                     </label>
+                    {pdfFiles.length > 1 && (
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        {pdfFiles.map((file) => (
+                          <div key={`${file.name}-${file.lastModified}-${file.size}`} className="truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-500">
+                            {file.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {editingPdfEntries.length > 0 && (
+                      <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Current attached PDFs</p>
+                        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                          {editingPdfEntries.map((pdf, index) => (
+                            <a
+                              key={`${pdf.url}-${index}`}
+                              href={pdf.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex max-w-full items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                            >
+                              <FileText size={14} className="shrink-0" />
+                              <span className="truncate">{pdf.name}</span>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row">
@@ -433,17 +517,18 @@ const AdminRecognizedOrgs = () => {
                                   <Calendar size={14} className="text-maroon-800" />
                                   {formatEstablishedDate(record.date_established)}
                                 </div>
-                                {record.pdf_url && (
+                                {getPdfEntries(record).map((pdf, index) => (
                                   <a
-                                    href={record.pdf_url}
+                                    key={`${pdf.url}-${index}`}
+                                    href={pdf.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                                    className="inline-flex max-w-full items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
                                   >
-                                    <FileText size={14} />
-                                    Compliance PDF
+                                    <FileText size={14} className="shrink-0" />
+                                    <span className="truncate">{pdf.name}</span>
                                   </a>
-                                )}
+                                ))}
                               </div>
                             </div>
                           </div>
