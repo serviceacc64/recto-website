@@ -281,22 +281,32 @@ const AdminRecognizedOrgs = () => {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">Identity Logo</label>
-                      <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-center transition hover:border-maroon-200 hover:bg-maroon-50/60">
-                        <ImageIcon size={24} className="text-maroon-800" />
-                        <span className="mt-3 w-full truncate text-xs font-semibold text-gray-500">
-                          {logoFile ? logoFile.name : 'Upload Logo'}
-                        </span>
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => setLogoFile(e.target.files[0])} />
+                      <label className="flex min-h-32 cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 transition hover:border-maroon-200 hover:bg-maroon-50/60">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white text-maroon-800 shadow-sm">
+                          <ImageIcon size={18} />
+                        </div>
+                        <div className="min-w-0 text-left">
+                          <span className="block truncate text-sm font-semibold text-gray-700">
+                            {logoFile ? logoFile.name : 'No logo chosen'}
+                          </span>
+                          <span className="mt-0.5 block text-xs text-gray-400">PNG, JPG, or WEBP logo image</span>
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => setLogoFile(e.target.files?.[0] || null)} />
                       </label>
                     </div>
                     <div>
                       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">Structure Chart</label>
-                      <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 text-center transition hover:border-maroon-200 hover:bg-maroon-50/60">
-                        <Upload size={24} className="text-maroon-800" />
-                        <span className="mt-3 w-full truncate text-xs font-semibold text-gray-500">
-                          {chartFile ? chartFile.name : 'Upload Chart'}
-                        </span>
-                        <input type="file" className="hidden" accept="image/*" onChange={(e) => setChartFile(e.target.files[0])} />
+                      <label className="flex min-h-32 cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-4 transition hover:border-maroon-200 hover:bg-maroon-50/60">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white text-maroon-800 shadow-sm">
+                          <Upload size={18} />
+                        </div>
+                        <div className="min-w-0 text-left">
+                          <span className="block truncate text-sm font-semibold text-gray-700">
+                            {chartFile ? chartFile.name : 'No chart chosen'}
+                          </span>
+                          <span className="mt-0.5 block text-xs text-gray-400">PNG, JPG, or WEBP structure chart</span>
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => setChartFile(e.target.files?.[0] || null)} />
                       </label>
                     </div>
                   </div>
@@ -313,7 +323,7 @@ const AdminRecognizedOrgs = () => {
                         </span>
                         <span className="mt-0.5 block text-xs text-gray-400">Compliance report, accreditation certificate, or recognition document (PDF)</span>
                       </div>
-                      <input type="file" className="hidden" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files[0])} />
+                      <input type="file" className="hidden" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
                     </label>
                   </div>
 

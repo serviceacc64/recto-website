@@ -12,6 +12,75 @@ import coveredcourtImg from '../assets/imgs/coveredcourt.jpg';
 import mapehImg from '../assets/imgs/mapeh.png';
 import schoolmapImg from '../assets/imgs/schoolmap.png';
 
+const SkeletonLine = ({ className = '' }) => (
+  <div className={`animate-pulse rounded-full bg-gray-200 ${className}`} />
+);
+
+const StatSkeleton = () => (
+  <div className="mt-4 h-8 w-14 animate-pulse rounded-lg bg-gray-200" />
+);
+
+const PostCardSkeleton = ({ variant = 'light' }) => {
+  const fillClass = variant === 'soft' ? 'bg-gray-100' : 'bg-white';
+
+  return (
+    <article className={`overflow-hidden rounded-[1.5rem] ${fillClass} shadow-sm ring-1 ring-black/5`}>
+      <div className="h-60 animate-pulse bg-gray-200" />
+      <div className="space-y-5 p-6">
+        <div className="flex items-center gap-2">
+          <SkeletonLine className="h-3 w-3" />
+          <SkeletonLine className="h-3 w-28" />
+        </div>
+        <div className="space-y-3">
+          <SkeletonLine className="h-6 w-11/12" />
+          <SkeletonLine className="h-6 w-8/12" />
+        </div>
+        <div className="space-y-2">
+          <SkeletonLine className="h-3 w-full" />
+          <SkeletonLine className="h-3 w-10/12" />
+          <SkeletonLine className="h-3 w-7/12" />
+        </div>
+        <SkeletonLine className="h-11 w-32" />
+      </div>
+    </article>
+  );
+};
+
+const VideoSkeleton = () => (
+  <>
+    <div className="featured-main">
+      <div className="aspect-video animate-pulse overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/10 shadow-2xl" />
+      <div className="mt-8 space-y-4">
+        <div className="h-8 w-2/3 animate-pulse rounded-full bg-white/15" />
+        <div className="h-4 w-full animate-pulse rounded-full bg-white/10" />
+        <div className="h-4 w-8/12 animate-pulse rounded-full bg-white/10" />
+        <div className="h-3 w-44 animate-pulse rounded-full bg-white/10" />
+      </div>
+    </div>
+
+    <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.06] p-5">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="h-8 w-28 animate-pulse rounded-full bg-white/15" />
+        <div className="h-3 w-36 animate-pulse rounded-full bg-white/10" />
+      </div>
+      <div className="space-y-4">
+        {[1, 2, 3].map((item) => (
+          <div key={item} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="flex gap-4">
+              <div className="h-14 w-14 shrink-0 animate-pulse rounded-xl bg-white/10" />
+              <div className="min-w-0 flex-1 space-y-3">
+                <div className="h-4 w-9/12 animate-pulse rounded-full bg-white/15" />
+                <div className="h-3 w-full animate-pulse rounded-full bg-white/10" />
+                <div className="h-3 w-5/12 animate-pulse rounded-full bg-white/10" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </>
+);
+
 const Home = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [news, setNews] = useState([]);
@@ -367,7 +436,7 @@ const Home = () => {
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                   <Megaphone size={18} />
                 </div>
-                <p className="mt-4 text-2xl font-bold tracking-tight text-gray-950">{loading ? '--' : announcements.length}</p>
+                {loading ? <StatSkeleton /> : <p className="mt-4 text-2xl font-bold tracking-tight text-gray-950">{announcements.length}</p>}
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Notices posted</p>
               </div>
 
@@ -392,7 +461,7 @@ const Home = () => {
           <div className="announcements-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="announcementsGrid">
             {loading ? (
               [1, 2, 3].map((item) => (
-                <div key={item} className="h-[420px] animate-pulse rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5"></div>
+                <PostCardSkeleton key={item} />
               ))
             ) : announcements.length > 0 ? (
               paginateItems(announcements, announcementPage).map((announcement) => (
@@ -432,7 +501,7 @@ const Home = () => {
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-maroon-50 text-maroon-800">
                   <Newspaper size={18} />
                 </div>
-                <p className="mt-4 text-2xl font-bold tracking-tight text-gray-950">{loading ? '--' : news.length}</p>
+                {loading ? <StatSkeleton /> : <p className="mt-4 text-2xl font-bold tracking-tight text-gray-950">{news.length}</p>}
                 <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Stories posted</p>
               </div>
 
@@ -456,7 +525,7 @@ const Home = () => {
           <div className="news-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="newsGrid">
             {loading ? (
               [1, 2, 3].map((item) => (
-                <div key={item} className="h-[420px] animate-pulse rounded-[1.5rem] bg-gray-100"></div>
+                <PostCardSkeleton key={item} variant="soft" />
               ))
             ) : news.length > 0 ? (
               paginateItems(news, newsPage).map((newsItem) => (
@@ -491,6 +560,10 @@ const Home = () => {
           </div>
 
           <div className="featured-video-grid grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-8 items-start">
+            {loading ? (
+              <VideoSkeleton />
+            ) : (
+              <>
             <div className="featured-main">
               <div className="video-wrapper aspect-video overflow-hidden rounded-[1.5rem] bg-black border border-white/10 shadow-2xl">
                 {selectedVideo && (
@@ -560,6 +633,8 @@ const Home = () => {
                 ))}
               </div>
             </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -639,29 +714,47 @@ const Home = () => {
             </div>
 
             {showAllFacilities && (
-              <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-12">
-                {facilities.map((facility, index) => (
-                  <article
-                    key={facility.title}
-                    className={`group relative min-h-[340px] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-maroon-950/10 ${facility.spanClass}`}
+              <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-maroon-100 bg-white shadow-[0_18px_45px_rgba(93,0,0,0.08)]">
+                <div className="h-1.5 bg-maroon-800" />
+                <div className="min-h-[560px] p-6 sm:p-10 lg:p-12">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-maroon-300">
+                    Facilities Directory
+                  </p>
+
+                  <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-12">
+                    {facilities.map((facility, index) => (
+                      <article
+                        key={facility.title}
+                        className={`group relative min-h-[300px] overflow-hidden rounded-[1.25rem] bg-gray-950 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-maroon-950/10 ${facility.spanClass}`}
+                      >
+                        <img
+                          src={facility.image}
+                          alt={facility.title}
+                          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent"></div>
+                        <div className="absolute bottom-7 left-7 right-7 text-white sm:bottom-8 sm:left-8 sm:right-8">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">
+                            {String(index + 1).padStart(2, '0')}
+                          </span>
+                          <h3 className="mt-3 text-2xl font-bold italic tracking-tight sm:text-3xl">{facility.title}</h3>
+                          <p className="mt-3 max-w-xl text-sm font-medium leading-7 text-white/80">
+                            {facility.description}
+                          </p>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowAllFacilities(false)}
+                    className="mt-12 inline-flex min-h-11 items-center gap-5 px-2 text-[11px] font-bold uppercase tracking-widest text-maroon-900 transition-all hover:text-maroon-700"
                   >
-                    <img
-                      src={facility.image}
-                      alt={facility.title}
-                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent"></div>
-                    <div className="absolute bottom-7 left-7 right-7 text-white sm:bottom-9 sm:left-9 sm:right-9">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <h3 className="mt-3 text-3xl font-bold italic tracking-tight sm:text-4xl">{facility.title}</h3>
-                      <p className="mt-3 max-w-xl text-sm font-medium leading-7 text-white/80 sm:text-base">
-                        {facility.description}
-                      </p>
-                    </div>
-                  </article>
-                ))}
+                    Show Less
+                    <ArrowRight size={18} className="-rotate-90" />
+                  </button>
+                </div>
               </div>
             )}
          </div>

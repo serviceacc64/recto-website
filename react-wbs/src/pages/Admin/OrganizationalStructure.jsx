@@ -23,6 +23,7 @@ const departments = [
 
 const AdminOrgStructure = () => {
   const [departmentRecords, setDepartmentRecords] = useState({});
+  const [uploadedFileNames, setUploadedFileNames] = useState({});
   const [loading, setLoading] = useState(true);
   const [submittingDept, setSubmittingDept] = useState('');
 
@@ -62,8 +63,12 @@ const AdminOrgStructure = () => {
     if (!selectedFile) return;
     
     setSubmittingDept(department.id);
+    setUploadedFileNames((current) => ({
+      ...current,
+      [department.id]: selectedFile.name
+    }));
+
     try {
-      const existingRecord = departmentRecords[department.id];
       const fileExt = selectedFile.name.split('.').pop();
       const safeDepartment = department.id.replace(/\s+/g, '-').toLowerCase();
       const fileName = `org-${safeDepartment}-${selectedFile.lastModified}-${selectedFile.size}-${Math.round(uploadStamp)}.${fileExt}`;
@@ -107,6 +112,11 @@ const AdminOrgStructure = () => {
         .eq('department', department.id);
 
       if (error) throw error;
+      setUploadedFileNames((current) => {
+        const next = { ...current };
+        delete next[department.id];
+        return next;
+      });
       await fetchDepartmentRecords();
     } catch (err) {
       alert(`Delete failed: ${err.message}`);
@@ -202,6 +212,7 @@ const AdminOrgStructure = () => {
               <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2 2xl:grid-cols-3">
                 {departments.map((department) => {
                   const record = departmentRecords[department.id];
+                  const uploadedFileName = uploadedFileNames[department.id];
                   const inputId = `org-chart-${department.id.replace(/\s+/g, '-').toLowerCase()}`;
                   const isSubmitting = submittingDept === department.id;
 
@@ -281,6 +292,18 @@ const AdminOrgStructure = () => {
                             </button>
                           )}
                         </div>
+
+                        {uploadedFileName && (
+                          <div className="mt-3 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                            <Upload size={15} className="shrink-0 text-gray-400" />
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-semibold text-gray-800">{uploadedFileName}</p>
+                              <p className="text-xs text-gray-500">
+                                {isSubmitting ? 'Uploading image file' : 'Latest uploaded image'}
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </article>
                   );

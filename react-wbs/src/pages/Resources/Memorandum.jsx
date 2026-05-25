@@ -224,8 +224,8 @@ const Memorandum = ({ tableName, title }) => {
                 <thead>
                   <tr className="bg-gray-950 text-[10px] font-bold uppercase tracking-[0.28em] text-white">
                     <th className="px-6 py-5">Archive Date</th>
-                    <th className="px-6 py-5">Document</th>
-                    <th className="hidden px-6 py-5 lg:table-cell">Summary</th>
+                    <th className="px-6 py-5">Title</th>
+                    <th className="hidden px-6 py-5 lg:table-cell">Description</th>
                     <th className="px-6 py-5 text-right">Access</th>
                   </tr>
                 </thead>

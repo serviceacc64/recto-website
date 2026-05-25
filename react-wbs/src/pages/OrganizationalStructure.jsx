@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { X, Calendar, ImageIcon, ArrowUpRight, UserRound, ShieldCheck, Building2 } from 'lucide-react';
+import { X, Calendar, ImageIcon, ArrowUpRight, ShieldCheck, Building2 } from 'lucide-react';
 import HeroWaveBackground from '../components/HeroWaveBackground';
 
 // Import local images
@@ -14,14 +14,14 @@ import mapeh from '../assets/imgs/mapeh.png';
 import esp from '../assets/imgs/esp.png';
 
 const departments = [
-  { id: 'TLE', name: 'TLE DEPARTMENT', image: tle, head: 'Department Head' },
-  { id: 'Math', name: 'MATH DEPARTMENT', image: math, head: 'Department Head' },
-  { id: 'English', name: 'ENGLISH DEPARTMENT', image: english, head: 'Department Head' },
-  { id: 'Science', name: 'SCIENCE DEPARTMENT', image: science, head: 'Department Head' },
-  { id: 'Filipino', name: 'FILIPINO DEPARTMENT', image: filipino, head: 'Department Head' },
-  { id: 'AP', name: 'AP DEPARTMENT', image: ap, head: 'Department Head' },
-  { id: 'MAPEH', name: 'MAPEH DEPARTMENT', image: mapeh, head: 'Department Head' },
-  { id: 'Values Education', name: 'VALUES EDUCATION DEPARTMENT', image: esp, head: 'Department Head' },
+  { id: 'TLE', name: 'TLE DEPARTMENT', image: tle },
+  { id: 'Math', name: 'MATH DEPARTMENT', image: math },
+  { id: 'English', name: 'ENGLISH DEPARTMENT', image: english },
+  { id: 'Science', name: 'SCIENCE DEPARTMENT', image: science },
+  { id: 'Filipino', name: 'FILIPINO DEPARTMENT', image: filipino },
+  { id: 'AP', name: 'AP DEPARTMENT', image: ap },
+  { id: 'MAPEH', name: 'MAPEH DEPARTMENT', image: mapeh },
+  { id: 'Values Education', name: 'VALUES EDUCATION DEPARTMENT', image: esp },
 ];
 
 const OrganizationalStructure = () => {
@@ -189,16 +189,6 @@ const OrganizationalStructure = () => {
                 </p>
 
                 <div className="mt-8 space-y-3">
-                  <div className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 text-gray-500">
-                      <UserRound size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Supervisor</p>
-                      <p className="text-sm font-bold text-gray-950">{selectedDept.head}</p>
-                    </div>
-                  </div>
-
                   {!loading && modalData?.updated_at && (
                     <div className="flex items-center gap-4 rounded-2xl bg-gray-950 p-4 text-white shadow-lg">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-maroon-200">

@@ -234,25 +234,33 @@ const AdminResearch = () => {
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-semibold text-gray-700">Research PDF</label>
-              <label className="flex min-h-[128px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 text-center transition hover:border-maroon-300 hover:bg-maroon-50/40">
-                <Upload size={22} className="text-gray-500" />
-                <span className="mt-3 w-full truncate text-sm font-bold text-gray-800">
-                  {file ? file.name : 'Choose PDF File'}
-                </span>
-                <span className="mt-1 text-xs text-gray-500">PDF file for public viewing</span>
-                <input type="file" className="hidden" accept=".pdf,application/pdf" onChange={(e) => setFile(e.target.files[0])} />
+              <label className="flex min-h-[128px] cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 transition hover:border-maroon-300 hover:bg-maroon-50/40">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white text-gray-500 shadow-sm">
+                  <Upload size={18} />
+                </div>
+                <div className="min-w-0 text-left">
+                  <span className="block truncate text-sm font-bold text-gray-800">
+                    {file ? file.name : 'No PDF chosen'}
+                  </span>
+                  <span className="mt-1 block text-xs text-gray-500">PDF file for public viewing</span>
+                </div>
+                <input type="file" className="hidden" accept=".pdf,application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} />
               </label>
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-semibold text-gray-700">Cover Image</label>
-              <label className="flex min-h-[128px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 text-center transition hover:border-maroon-300 hover:bg-maroon-50/40">
-                <ImageIcon size={22} className="text-gray-500" />
-                <span className="mt-3 w-full truncate text-sm font-bold text-gray-800">
-                  {imageFile ? imageFile.name : 'Choose Cover Image'}
-                </span>
-                <span className="mt-1 text-xs text-gray-500">Optional JPG, PNG, or WEBP image</span>
-                <input type="file" className="hidden" accept="image/*" onChange={(e) => setImageFile(e.target.files[0])} />
+              <label className="flex min-h-[128px] cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-5 transition hover:border-maroon-300 hover:bg-maroon-50/40">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-white text-gray-500 shadow-sm">
+                  <ImageIcon size={18} />
+                </div>
+                <div className="min-w-0 text-left">
+                  <span className="block truncate text-sm font-bold text-gray-800">
+                    {imageFile ? imageFile.name : 'No cover image chosen'}
+                  </span>
+                  <span className="mt-1 block text-xs text-gray-500">Optional JPG, PNG, or WEBP image</span>
+                </div>
+                <input type="file" className="hidden" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
               </label>
             </div>
           </div>
