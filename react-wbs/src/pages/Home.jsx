@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { toEmbedUrl } from '../lib/videoUtils';
+import {
+  getGoogleDriveViewUrl,
+  getVideoProvider,
+  getVideoSourceUrl,
+  getVideoThumbnailUrl,
+  toEmbedUrl
+} from '../lib/videoUtils';
 import { Calendar, ArrowRight, Award, GraduationCap, Megaphone, Newspaper, Play, X } from 'lucide-react';
 import HeroWaveBackground from '../components/HeroWaveBackground';
 import welcomeImg from '../assets/imgs/welcome.png';
@@ -239,6 +245,95 @@ const Home = () => {
         </button>
       );
     });
+  };
+
+  const renderSelectedVideoPlayer = () => {
+    const sourceUrl = getVideoSourceUrl(selectedVideo);
+    const provider = getVideoProvider(sourceUrl);
+
+    if (!selectedVideo || !sourceUrl) {
+      return (
+        <div className="flex h-full min-h-[320px] items-center justify-center bg-white/5 text-white/40">
+          <Play size={40} />
+        </div>
+      );
+    }
+
+    if (provider === 'youtube') {
+      return (
+        <iframe
+          key={selectedVideo.id}
+          id="mainVideo"
+          title={selectedVideo.title}
+          width="100%"
+          src={toEmbedUrl(sourceUrl)}
+          className="h-full w-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      );
+    }
+
+    if (provider === 'direct') {
+      return (
+        <video
+          key={selectedVideo.id}
+          id="mainVideo"
+          title={selectedVideo.title}
+          src={sourceUrl}
+          className="h-full w-full bg-black"
+          controls
+          playsInline
+        />
+      );
+    }
+
+    if (provider === 'google-drive') {
+      const thumbnailUrl = getVideoThumbnailUrl(selectedVideo);
+      const driveUrl = getGoogleDriveViewUrl(sourceUrl);
+
+      return (
+        <div className="relative flex h-full min-h-[320px] items-center justify-center overflow-hidden bg-black p-8 text-center">
+          {thumbnailUrl && (
+            <img
+              src={thumbnailUrl}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover opacity-35"
+            />
+          )}
+          <div className="relative z-10 max-w-md">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm">
+              <Play size={24} fill="currentColor" />
+            </div>
+            <h4 className="mt-5 text-xl font-bold text-white">Open this video in Google Drive</h4>
+            <p className="mt-3 text-sm leading-6 text-white/60">
+              Google Drive blocks this file from playing inside embedded frames on external websites.
+            </p>
+            <a
+              href={driveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-bold uppercase tracking-widest text-maroon-900 transition hover:bg-maroon-50"
+            >
+              Open Video
+              <ArrowRight size={16} />
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex h-full min-h-[320px] items-center justify-center bg-white/5 p-8 text-center">
+        <div className="max-w-md">
+          <Play className="mx-auto text-white/40" size={40} />
+          <h4 className="mt-5 text-xl font-bold text-white">Unsupported video source</h4>
+          <p className="mt-3 text-sm leading-6 text-white/60">
+            Use a YouTube link or upload an MP4/WEBM video file from the admin page.
+          </p>
+        </div>
+      </div>
+    );
   };
 
   const AnnouncementCard = ({ item }) => (
@@ -566,18 +661,7 @@ const Home = () => {
               <>
             <div className="featured-main">
               <div className="video-wrapper aspect-video overflow-hidden rounded-[1.5rem] bg-black border border-white/10 shadow-2xl">
-                {selectedVideo && (
-                  <iframe
-                    key={selectedVideo.id}
-                    id="mainVideo"
-                    title={selectedVideo.title}
-                    width="100%"
-                    src={toEmbedUrl(selectedVideo.video_url || selectedVideo.embedUrl)}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                )}
+                {renderSelectedVideoPlayer()}
               </div>
 
               <div className="video-info mt-8 space-y-3">
@@ -603,34 +687,54 @@ const Home = () => {
                   Tap a card to switch videos
                 </span>
               </div>
-              <div className="video-list space-y-4" id="videoList">
-                {featuredVideos.map((video) => (
-                  <button
-                    key={video.id}
-                    type="button"
-                    onClick={() => setSelectedVideo(video)}
-                    className={`w-full text-left rounded-2xl border p-4 transition-all duration-300 ${
-                      selectedVideo?.id === video.id
-                        ? 'border-maroon-300 bg-maroon-800/40'
-                        : 'border-white/10 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.07]'
-                    }`}
-                  >
-                    <div className="flex gap-4">
-                      <div className="w-14 h-14 shrink-0 rounded-xl bg-white/10 flex items-center justify-center text-maroon-100">
-                        <Play size={20} fill="currentColor" />
+              <div className="video-list max-h-[560px] space-y-4 overflow-y-auto pr-2" id="videoList">
+                {featuredVideos.map((video) => {
+                  const thumbnailUrl = getVideoThumbnailUrl(video);
+
+                  return (
+                    <button
+                      key={video.id}
+                      type="button"
+                      onClick={() => setSelectedVideo(video)}
+                      className={`w-full text-left rounded-2xl border p-4 transition-all duration-300 ${
+                        selectedVideo?.id === video.id
+                          ? 'border-maroon-300 bg-maroon-800/40'
+                          : 'border-white/10 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.07]'
+                      }`}
+                    >
+                      <div className="flex gap-4">
+                        <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-xl bg-white/10 text-maroon-100">
+                          {thumbnailUrl ? (
+                            <img
+                              src={thumbnailUrl}
+                              alt={`${video.title} thumbnail`}
+                              className="h-full w-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <Play size={20} fill="currentColor" />
+                            </div>
+                          )}
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm">
+                              <Play size={15} fill="currentColor" />
+                            </span>
+                          </span>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold leading-tight">{video.title}</h4>
+                          <p className="mt-2 text-xs text-white/50 line-clamp-2">{video.description}</p>
+                          <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-white/30">
+                            {video.created_at
+                              ? new Date(video.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                              : video.date}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="font-bold leading-tight">{video.title}</h4>
-                        <p className="mt-2 text-xs text-white/50 line-clamp-2">{video.description}</p>
-                        <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-white/30">
-                          {video.created_at
-                            ? new Date(video.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                            : video.date}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             </div>
               </>
