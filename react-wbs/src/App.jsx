@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import History from './pages/History';
@@ -23,10 +24,98 @@ import AdminMemoranda from './pages/Admin/Memoranda';
 import AdminLearningMaterials from './pages/Admin/LearningMaterials';
 import AdminLocation from './pages/Admin/Location';
 
+const siteName = 'RMNHS';
+
+const pageTitles = {
+  '/': 'Home',
+  '/about/history': 'Historical Profile',
+  '/about/vmc': 'Vision and Mission',
+  '/about/organizational-structure': 'Organizational Structure',
+  '/about/recognized-organizations': 'Recognized Organizations',
+  '/resources/school-memorandum': 'School Memorandum',
+  '/resources/division-memorandum': 'Division Memorandum',
+  '/resources/deped-memorandum': 'DepEd Memorandum',
+  '/resources/deped-order': 'DepEd Order',
+  '/resources/grade-7': 'Grade 7 Learning Materials',
+  '/resources/grade-8': 'Grade 8 Learning Materials',
+  '/resources/grade-9': 'Grade 9 Learning Materials',
+  '/resources/grade-10': 'Grade 10 Learning Materials',
+  '/location': 'Location',
+  '/research': 'Research',
+  '/transparency/info': 'Transparency Information',
+  '/transparency/app': 'Annual Procurement Plan',
+  '/transparency/award-contracts': 'Award of Contracts',
+  '/transparency/bac': 'Bids and Awards Committee',
+  '/transparency/bid-bulletin': 'Bid Bulletin',
+  '/transparency/invitation-to-bid': 'Invitation to Bid',
+  '/transparency/philgeps': 'PhilGEPS',
+  '/transparency/procurement-reports': 'Procurement Reports',
+  '/transparency/spta': 'SPTA',
+  '/transparency/sslg': 'SSLG',
+  '/transparency/bsp': 'BSP',
+  '/transparency/gsp': 'GSP',
+  '/transparency/tr': 'TR',
+  '/transparency/mooe': 'MOOE',
+  '/transparency/red-cross': 'Red Cross',
+  '/transparency/sef': 'SEF Records',
+  '/transparency/year-end-report': 'Year End Report',
+  '/admin/login': 'Admin Login',
+  '/admin/dashboard': 'Admin Dashboard',
+  '/admin/organizational-structure': 'Admin Organizational Structure',
+  '/admin/recognized-organizations': 'Admin Recognized Organizations',
+  '/admin/memoranda': 'Admin Memoranda',
+  '/admin/learning-materials': 'Admin Learning Materials',
+  '/admin/research': 'Admin Research',
+  '/admin/location': 'Admin Location',
+  '/admin/transparency': 'Admin Transparency',
+};
+
+const queryTitles = {
+  announcement: 'Announcements',
+  news: 'News',
+  videos: 'Videos',
+  school_memorandum: 'School Memorandum',
+  division_memorandum: 'Division Memorandum',
+  deped_memorandum: 'DepEd Memorandum',
+  deped_order: 'DepEd Order',
+  app: 'Annual Procurement Plan',
+  award_of_contracts: 'Award of Contracts',
+  bac: 'Bids and Awards Committee',
+  bid_bulletin: 'Bid Bulletin',
+  invitation_to_bid: 'Invitation to Bid',
+  philgeps: 'PhilGEPS',
+  procurement_reports: 'Procurement Reports',
+  spta: 'SPTA',
+  sslg: 'SSLG',
+  bsp: 'BSP',
+  gsp: 'GSP',
+  tr: 'TR',
+  mooe: 'MOOE',
+  red_cross: 'Red Cross',
+};
+
+function PageTitle() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryTitle = queryTitles[params.get('section')] || queryTitles[params.get('table')];
+    const pathTitle = pageTitles[location.pathname] || 'Page Under Construction';
+    const title = queryTitle && location.pathname.startsWith('/admin/')
+      ? `Admin ${queryTitle}`
+      : pathTitle;
+
+    document.title = `${title} | ${siteName}`;
+  }, [location.pathname, location.search]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <PageTitle />
         <Routes>
           {/* Admin Routes (No Layout) */}
           <Route path="/admin/login" element={<AdminLogin />} />

@@ -143,7 +143,7 @@ const Navbar = () => {
           />
           <div className="flex flex-col min-w-0">
             <span className={`text-xl font-bold tracking-tight transition-colors duration-500 ${showDarkNavbar ? 'text-white' : 'text-white'}`}>RMNHS</span>
-            <span className={`text-[10px] font-medium uppercase tracking-widest leading-none transition-colors duration-500 ${showDarkNavbar ? 'text-white/50' : 'text-white/60'}`}>Quezon Province</span>
+            <span className={`text-[10px] font-medium uppercase tracking-widest leading-none transition-colors duration-500 ${showDarkNavbar ? 'text-white/50' : 'text-white/60'}`}>Tiaong, Quezon</span>
           </div>
         </Link>
 

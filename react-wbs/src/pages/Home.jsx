@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { toEmbedUrl } from '../lib/videoUtils';
-import { Calendar, ArrowRight, Award, Users, GraduationCap, Clock, Megaphone, Newspaper, Play } from 'lucide-react';
+import { Calendar, ArrowRight, Award, GraduationCap, Megaphone, Newspaper, Play, X } from 'lucide-react';
 import HeroWaveBackground from '../components/HeroWaveBackground';
 import welcomeImg from '../assets/imgs/welcome.png';
 import makingImg from '../assets/imgs/making.png';
@@ -9,6 +9,8 @@ import tatakrectoImg from '../assets/imgs/tatakrecto.png';
 import speechlabImg from '../assets/imgs/speechlab.png';
 import comlabImg from '../assets/imgs/comlabG11-4.png';
 import coveredcourtImg from '../assets/imgs/coveredcourt.jpg';
+import mapehImg from '../assets/imgs/mapeh.png';
+import schoolmapImg from '../assets/imgs/schoolmap.png';
 
 const Home = () => {
   const [announcements, setAnnouncements] = useState([]);
@@ -19,9 +21,38 @@ const Home = () => {
   const [newsPage, setNewsPage] = useState(1);
   const [featuredVideos, setFeaturedVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedPostType, setSelectedPostType] = useState('');
+  const [showAllFacilities, setShowAllFacilities] = useState(false);
   
   const slides = [welcomeImg, makingImg, tatakrectoImg];
-  const itemsPerPage = 3;
+  const itemsPerPage = 6;
+  const facilities = [
+    {
+      title: 'Music Room',
+      description: 'Creative space for music classes, practice sessions, and performance preparation.',
+      image: mapehImg,
+      spanClass: 'lg:col-span-5',
+    },
+    {
+      title: 'ICT Computer Laboratory',
+      description: 'Computer laboratory supporting digital literacy, research, and technology-enabled lessons.',
+      image: comlabImg,
+      spanClass: 'lg:col-span-7',
+    },
+    {
+      title: 'Covered Court',
+      description: 'Multi-purpose venue for physical education, assemblies, performances, and school events.',
+      image: coveredcourtImg,
+      spanClass: 'lg:col-span-4',
+    },
+    {
+      title: 'Library',
+      description: 'Quiet learning area for reading, research, independent study, and reference work.',
+      image: schoolmapImg,
+      spanClass: 'lg:col-span-8',
+    },
+  ];
 
   // Hardcoded fallback playlist rendered when database has no videos yet
   const fallbackVideos = [
@@ -82,16 +113,38 @@ const Home = () => {
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const stats = [
-    { icon: <GraduationCap className="text-maroon-800" />, label: 'Students Enrolled', value: '4,500+' },
-    { icon: <Users className="text-maroon-800" />, label: 'Expert Educators', value: '180+' },
-    { icon: <Award className="text-maroon-800" />, label: 'Years of Excellence', value: '25+' },
-    { icon: <Clock className="text-maroon-800" />, label: 'Passing Rate', value: '98%' },
-  ];
-
   const paginateItems = (items, page) => {
     const startIndex = (page - 1) * itemsPerPage;
     return items.slice(startIndex, startIndex + itemsPerPage);
+  };
+
+  useEffect(() => {
+    if (!selectedPost) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setSelectedPost(null);
+        setSelectedPostType('');
+      }
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedPost]);
+
+  const openPostModal = (item, type) => {
+    setSelectedPost(item);
+    setSelectedPostType(type);
+  };
+
+  const closePostModal = () => {
+    setSelectedPost(null);
+    setSelectedPostType('');
   };
 
   const renderPagination = (totalItems, currentPage, setPage) => {
@@ -137,7 +190,11 @@ const Home = () => {
         </div>
         <h3 className="text-2xl font-bold text-gray-950 tracking-tight leading-tight">{item.title}</h3>
         <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">{item.description}</p>
-        <button className="inline-flex w-fit items-center gap-3 rounded-full border border-gray-200 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-600 transition-all hover:border-maroon-800 hover:text-maroon-800">
+        <button
+          type="button"
+          onClick={() => openPostModal(item, 'announcement')}
+          className="inline-flex w-fit items-center gap-3 rounded-full border border-gray-200 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-600 transition-all hover:border-maroon-800 hover:text-maroon-800"
+        >
           Read more <ArrowRight size={16} />
         </button>
       </div>
@@ -162,15 +219,94 @@ const Home = () => {
         </div>
         <h3 className="text-2xl font-bold text-gray-950 tracking-tight leading-tight">{item.title}</h3>
         <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">{item.description}</p>
-        <button className="inline-flex w-fit items-center gap-3 rounded-full border border-gray-200 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-600 transition-all hover:border-maroon-800 hover:text-maroon-800">
+        <button
+          type="button"
+          onClick={() => openPostModal(item, 'news')}
+          className="inline-flex w-fit items-center gap-3 rounded-full border border-gray-200 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-gray-600 transition-all hover:border-maroon-800 hover:text-maroon-800"
+        >
           Read more <ArrowRight size={16} />
         </button>
       </div>
     </article>
   );
 
+  const PostModal = () => {
+    if (!selectedPost) return null;
+
+    const isAnnouncement = selectedPostType === 'announcement';
+    const CategoryIcon = isAnnouncement ? Megaphone : Newspaper;
+    const category = isAnnouncement ? 'Announcement' : 'News';
+
+    return (
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 py-6 backdrop-blur-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="post-modal-title"
+        onClick={closePostModal}
+      >
+        <article
+          className="relative max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={closePostModal}
+            aria-label="Close details"
+            className="sticky top-5 float-right mr-5 mt-5 flex h-12 w-12 items-center justify-center rounded-full bg-gray-700 text-white shadow-lg transition hover:bg-maroon-800"
+          >
+            <X size={26} />
+          </button>
+
+          <div className="px-6 pb-12 pt-8 sm:px-12 lg:px-20">
+            <div className="mx-auto flex min-h-[260px] max-w-3xl items-center justify-center">
+              {selectedPost.image_url ? (
+                <img
+                  src={selectedPost.image_url}
+                  alt={selectedPost.title}
+                  className="max-h-[360px] w-full rounded-md object-contain"
+                />
+              ) : (
+                <div className="flex h-72 w-full items-center justify-center rounded-md bg-maroon-50 text-maroon-800">
+                  <CategoryIcon size={72} />
+                </div>
+              )}
+            </div>
+
+            <div className="mx-auto mt-12 max-w-4xl">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-maroon-800">
+                {category}
+              </p>
+              <p className="mt-4 text-base text-gray-400">
+                {new Date(selectedPost.created_at).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </p>
+              <h2 id="post-modal-title" className="mt-8 text-4xl font-bold tracking-tight text-gray-950 sm:text-5xl">
+                {selectedPost.title}
+              </h2>
+              <p className="mt-10 text-base text-gray-400">RMNHS Office</p>
+
+              <div className="my-8 border-t border-gray-200"></div>
+
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-maroon-800">
+                {category}
+              </p>
+              <p className="mt-8 whitespace-pre-line text-base leading-8 text-gray-700">
+                {selectedPost.description || 'No details available.'}
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
+    );
+  };
+
   return (
     <main className="flex w-full flex-col overflow-x-hidden bg-[#f7f7f5] font-outfit text-gray-950">
+      <PostModal />
       
       {/* Cinematic Hero Section */}
       <section className="relative h-[85dvh] min-h-[480px] w-full overflow-hidden bg-black sm:h-[90dvh] lg:h-screen">
@@ -207,25 +343,6 @@ const Home = () => {
                     currentSlide === index ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'
                   }`}
                 />
-              ))}
-           </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16">
-        <div className="user-screen-container">
-           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {stats.map((stat, idx) => (
-                <div key={idx} className="group flex flex-col gap-2 rounded-[1.5rem] bg-white p-6 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-maroon-950/10">
-                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-maroon-50 shadow-sm transition-transform group-hover:scale-105">
-                      {stat.icon}
-                   </div>
-                   <div className="mt-4">
-                      <h4 className="text-4xl font-bold text-gray-950">{stat.value}</h4>
-                      <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mt-1">{stat.label}</p>
-                   </div>
-                </div>
               ))}
            </div>
         </div>
@@ -474,7 +591,7 @@ const Home = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   <div className="absolute bottom-6 left-6 right-6 text-white sm:bottom-10 sm:left-10">
                      <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">02</span>
-                     <h3 className="mt-2 text-xl font-bold italic sm:text-2xl lg:text-3xl">ICT Center</h3>
+                     <h3 className="mt-2 text-xl font-bold italic sm:text-2xl lg:text-3xl">Music Room</h3>
                   </div>
                </div>
 
@@ -483,19 +600,70 @@ const Home = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   <div className="absolute bottom-6 left-6 right-6 text-white sm:bottom-10 sm:left-10">
                      <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">03</span>
-                     <h3 className="mt-2 text-xl font-bold italic sm:text-2xl lg:text-3xl">Covered Court</h3>
+                     <h3 className="mt-2 text-xl font-bold italic sm:text-2xl lg:text-3xl">Library</h3>
                   </div>
                </div>
 
-               <div className="group relative min-h-[260px] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 md:col-span-7 md:min-h-[320px]">
-                  <img src={makingImg} alt="Innovation" className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-1000" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-maroon-900/40 to-transparent"></div>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center sm:p-10 lg:p-12">
-                     <h3 className="text-2xl font-bold tracking-tighter text-white italic sm:text-3xl lg:text-5xl">Innovating Education for the Future.</h3>
-                     <button type="button" className="mt-6 inline-flex min-h-11 items-center gap-3 rounded-full bg-maroon-800 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-900 sm:mt-8">Explore More <ArrowRight size={18} /></button>
+               <div className="relative min-h-[260px] overflow-hidden rounded-[1.5rem] border border-maroon-100 bg-maroon-950 p-7 text-white shadow-sm md:col-span-7 md:min-h-[320px] sm:p-10">
+                  <div className="absolute inset-x-0 top-0 h-1 bg-maroon-600"></div>
+                  <div className="flex h-full flex-col justify-between gap-10">
+                     <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-maroon-200">Facilities Directory</p>
+                        <h3 className="mt-4 max-w-2xl text-3xl font-bold italic tracking-tight sm:text-4xl lg:text-5xl">
+                          Explore campus learning spaces.
+                        </h3>
+                        <p className="mt-5 max-w-xl text-sm leading-7 text-white/70 sm:text-base">
+                          View the complete list of school facilities used for instruction, research, reading, performance, and student activities.
+                        </p>
+                     </div>
+
+                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        {facilities.map((facility) => (
+                          <div key={facility.title} className="rounded-2xl border border-white/10 bg-white/[0.06] p-3">
+                            <span className="block text-[10px] font-bold uppercase tracking-widest text-white/40">Space</span>
+                            <span className="mt-1 block text-sm font-bold leading-tight text-white">{facility.title}</span>
+                          </div>
+                        ))}
+                     </div>
+
+                     <button
+                       type="button"
+                       onClick={() => setShowAllFacilities((current) => !current)}
+                       className="inline-flex w-fit min-h-11 items-center gap-3 rounded-full bg-white px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-maroon-900 transition-all hover:bg-maroon-50"
+                     >
+                       {showAllFacilities ? 'Show Less' : 'Explore More'}
+                       <ArrowRight size={18} className={`transition-transform ${showAllFacilities ? '-rotate-90' : ''}`} />
+                     </button>
                   </div>
                </div>
             </div>
+
+            {showAllFacilities && (
+              <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-12">
+                {facilities.map((facility, index) => (
+                  <article
+                    key={facility.title}
+                    className={`group relative min-h-[340px] overflow-hidden rounded-[1.5rem] bg-white shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-maroon-950/10 ${facility.spanClass}`}
+                  >
+                    <img
+                      src={facility.image}
+                      alt={facility.title}
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent"></div>
+                    <div className="absolute bottom-7 left-7 right-7 text-white sm:bottom-9 sm:left-9 sm:right-9">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <h3 className="mt-3 text-3xl font-bold italic tracking-tight sm:text-4xl">{facility.title}</h3>
+                      <p className="mt-3 max-w-xl text-sm font-medium leading-7 text-white/80 sm:text-base">
+                        {facility.description}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
          </div>
       </section>
 
