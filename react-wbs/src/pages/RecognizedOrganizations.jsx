@@ -190,7 +190,7 @@ const RecognizedOrganizations = () => {
           onClick={() => setSelectedRecord(null)}
         >
           <div 
-            className="relative flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-6 duration-300"
+            className="relative flex max-h-[94vh] w-full max-w-5xl flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-6 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <button 
@@ -202,13 +202,13 @@ const RecognizedOrganizations = () => {
               <X size={22} />
             </button>
 
-            <div className="grid overflow-y-auto lg:grid-cols-[minmax(0,1fr)_380px]">
-              <div className="min-h-0 bg-white p-5 md:min-h-[520px] md:p-8">
-                <div className="flex h-full min-h-[240px] items-center justify-center overflow-hidden rounded-[1.5rem] border border-gray-200 bg-[#fbfbfa] sm:min-h-[320px] md:min-h-[480px]">
+            <div className="grid overflow-y-auto lg:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="min-h-0 bg-white p-2 md:min-h-[620px] md:p-4">
+                <div className="flex h-full min-h-[360px] items-center justify-center overflow-hidden rounded-[1.5rem] border border-gray-200 bg-[#fbfbfa] sm:min-h-[460px] md:min-h-[620px]">
                   <img 
                     src={resolveImageUrl(selectedRecord, 'chart')} 
                     alt={`${selectedRecord.org_name} Chart`} 
-                    className="h-full max-h-[68vh] w-full object-contain p-4 md:p-8" 
+                    className="h-full max-h-[88vh] w-full object-contain p-1 md:p-2" 
                   />
                 </div>
               </div>
