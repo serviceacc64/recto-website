@@ -29,6 +29,7 @@ const AdminRecognizedOrgs = () => {
   const [logoFile, setLogoFile] = useState(null);
   const [chartFile, setChartFile] = useState(null);
   const [pdfFiles, setPdfFiles] = useState([]);
+  const [currentPdfEntries, setCurrentPdfEntries] = useState([]);
 
   const queryRecords = useCallback(async () => {
     const { data, error } = await supabase
@@ -98,6 +99,33 @@ const AdminRecognizedOrgs = () => {
     );
   };
 
+  const getPdfNameFromUrl = (url, fallback = 'Compliance PDF') => {
+    if (!url) return fallback;
+
+    try {
+      const pathname = new URL(url).pathname;
+      const fileName = decodeURIComponent(pathname.split('/').pop() || '');
+      return fileName || fallback;
+    } catch {
+      const fileName = decodeURIComponent(url.split('/').pop()?.split('?')[0] || '');
+      return fileName || fallback;
+    }
+  };
+
+  const getPdfEntries = (record) => {
+    const urls = record.pdf_urls || [];
+    const names = record.pdf_names || [];
+
+    if (urls.length > 0) {
+      return urls.map((url, index) => ({
+        url,
+        name: names[index] || getPdfNameFromUrl(url, `Compliance PDF ${index + 1}`)
+      }));
+    }
+
+    return record.pdf_url ? [{ url: record.pdf_url, name: getPdfNameFromUrl(record.pdf_url) }] : [];
+  };
+
   const resetForm = () => {
     setEditingId(null);
     setOrgName('');
@@ -106,6 +134,7 @@ const AdminRecognizedOrgs = () => {
     setLogoFile(null);
     setChartFile(null);
     setPdfFiles([]);
+    setCurrentPdfEntries([]);
   };
 
   const getEstablishedYear = (dateValue) => {
@@ -122,6 +151,7 @@ const AdminRecognizedOrgs = () => {
     setLogoFile(null);
     setChartFile(null);
     setPdfFiles([]);
+    setCurrentPdfEntries(getPdfEntries(record));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -141,15 +171,12 @@ const AdminRecognizedOrgs = () => {
 
       if (logoUrl) payload.logo_url = logoUrl;
       if (chartUrl) payload.chart_url = chartUrl;
-      if (uploadedPdfs.length > 0) {
-        const currentPdfEntries = editingId
-          ? getPdfEntries(records.find((record) => record.id === editingId) || {})
-          : [];
+      if (editingId || uploadedPdfs.length > 0) {
         const allPdfs = [...currentPdfEntries, ...uploadedPdfs];
 
         payload.pdf_urls = allPdfs.map((file) => file.url);
         payload.pdf_names = allPdfs.map((file) => file.name);
-        payload.pdf_url = allPdfs[0].url;
+        payload.pdf_url = allPdfs[0]?.url || null;
       }
 
       const { error } = editingId
@@ -179,20 +206,6 @@ const AdminRecognizedOrgs = () => {
 
   const withLogoCount = records.filter((record) => record.logo_url).length;
   const withChartCount = records.filter((record) => record.chart_url).length;
-  const getPdfEntries = (record) => {
-    const urls = record.pdf_urls || [];
-    const names = record.pdf_names || [];
-
-    if (urls.length > 0) {
-      return urls.map((url, index) => ({
-        url,
-        name: names[index] || `Compliance PDF ${index + 1}`
-      }));
-    }
-
-    return record.pdf_url ? [{ url: record.pdf_url, name: 'Compliance PDF' }] : [];
-  };
-
   const selectedPdfLabel = pdfFiles.length === 0
     ? editingId
       ? 'Choose PDFs to add'
@@ -200,9 +213,6 @@ const AdminRecognizedOrgs = () => {
     : pdfFiles.length === 1
       ? pdfFiles[0].name
       : `${pdfFiles.length} PDFs selected`;
-  const editingPdfEntries = editingId
-    ? getPdfEntries(records.find((record) => record.id === editingId) || {})
-    : [];
 
   const formatEstablishedDate = (dateValue) => {
     if (!dateValue) return '--';
@@ -383,30 +393,50 @@ const AdminRecognizedOrgs = () => {
                         onChange={(e) => setPdfFiles(Array.from(e.target.files || []))}
                       />
                     </label>
-                    {pdfFiles.length > 1 && (
+                    {pdfFiles.length > 0 && (
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                        {pdfFiles.map((file) => (
-                          <div key={`${file.name}-${file.lastModified}-${file.size}`} className="truncate rounded-md border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-500">
-                            {file.name}
+                        {pdfFiles.map((file, index) => (
+                          <div key={`${file.name}-${file.lastModified}-${file.size}`} className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-500">
+                            <span className="truncate">{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => setPdfFiles((files) => files.filter((_, fileIndex) => fileIndex !== index))}
+                              className="shrink-0 text-gray-400 transition hover:text-red-700"
+                              aria-label={`Remove ${file.name}`}
+                            >
+                              <Trash2 size={14} />
+                            </button>
                           </div>
                         ))}
                       </div>
                     )}
-                    {editingPdfEntries.length > 0 && (
+                    {currentPdfEntries.length > 0 && (
                       <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
                         <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Current attached PDFs</p>
                         <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                          {editingPdfEntries.map((pdf, index) => (
-                            <a
+                          {currentPdfEntries.map((pdf, index) => (
+                            <div
                               key={`${pdf.url}-${index}`}
-                              href={pdf.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex max-w-full items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                              className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700"
                             >
-                              <FileText size={14} className="shrink-0" />
-                              <span className="truncate">{pdf.name}</span>
-                            </a>
+                              <a
+                                href={pdf.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex min-w-0 items-center gap-2 transition hover:text-blue-900"
+                              >
+                                <FileText size={14} className="shrink-0" />
+                                <span className="truncate">{pdf.name}</span>
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => setCurrentPdfEntries((entries) => entries.filter((_, entryIndex) => entryIndex !== index))}
+                                className="shrink-0 rounded-md p-1 text-blue-400 transition hover:bg-red-50 hover:text-red-700"
+                                aria-label={`Remove ${pdf.name}`}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
                           ))}
                         </div>
                       </div>

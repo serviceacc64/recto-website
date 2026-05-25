@@ -34,13 +34,25 @@ const RecognizedOrganizations = () => {
     const entries = [];
     const urls = record.pdf_urls || [];
     const names = record.pdf_names || [];
+    const getPdfNameFromUrl = (url, fallback = 'Accomplishment Report') => {
+      if (!url) return fallback;
+
+      try {
+        const pathname = new URL(url).pathname;
+        const fileName = decodeURIComponent(pathname.split('/').pop() || '');
+        return fileName || fallback;
+      } catch {
+        const fileName = decodeURIComponent(url.split('/').pop()?.split('?')[0] || '');
+        return fileName || fallback;
+      }
+    };
 
     if (urls.length > 0) {
       urls.forEach((url, i) => {
-        entries.push({ url, name: names[i] || `Accomplishment Report ${i + 1}` });
+        entries.push({ url, name: names[i] || getPdfNameFromUrl(url, `Accomplishment Report ${i + 1}`) });
       });
     } else if (record.pdf_url) {
-      entries.push({ url: record.pdf_url, name: 'Accomplishment Report' });
+      entries.push({ url: record.pdf_url, name: getPdfNameFromUrl(record.pdf_url) });
     }
     return entries;
   };
