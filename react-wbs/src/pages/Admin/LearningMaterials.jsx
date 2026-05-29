@@ -14,7 +14,8 @@ import {
   Upload
 } from 'lucide-react';
 
-const gradeLevels = ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'];
+const gradeLevels = ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
+const quarterOptions = ['Quarter 1', 'Quarter 2', 'Quarter 3', 'Quarter 4'];
 
 const AdminLearningMaterials = () => {
   const [records, setRecords] = useState([]);
@@ -43,10 +44,11 @@ const AdminLearningMaterials = () => {
   const fetchRecords = useCallback(async () => {
     setLoading(true);
     try {
+      const selectedGrade = activeGrade.trim();
       const { data, error } = await supabase
         .from('learning_materials')
         .select('*')
-        .eq('grade', activeGrade)
+        .eq('grade', selectedGrade)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -79,10 +81,14 @@ const AdminLearningMaterials = () => {
     setSubmitting(true);
 
     try {
+      const selectedGrade = activeGrade.trim();
+      const selectedTitle = title.trim();
+      const selectedSubject = subject.trim();
+      const selectedQuarter = quarter.trim();
       let fileUrl = '';
       if (file) {
         const fileExt = file.name.split('.').pop();
-        const safeGrade = activeGrade.replace(/[^a-zA-Z0-9_-]/g, '-');
+        const safeGrade = selectedGrade.replace(/[^a-zA-Z0-9_-]/g, '-');
         const fileName = `lm-${safeGrade}-${file.lastModified}-${file.size}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
           .from('learning-materials')
@@ -98,10 +104,10 @@ const AdminLearningMaterials = () => {
       }
 
       const { error } = await supabase.from('learning_materials').insert([{
-        title,
-        subject,
-        grade: activeGrade,
-        quarter,
+        title: selectedTitle,
+        subject: selectedSubject,
+        grade: selectedGrade,
+        quarter: selectedQuarter,
         file_url: fileUrl,
         created_at: new Date().toISOString()
       }]);
@@ -172,21 +178,21 @@ const AdminLearningMaterials = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {gradeLevels.map((grade) => (
-                <button
-                  key={grade}
-                  type="button"
-                  onClick={() => setActiveGrade(grade)}
-                  className={`rounded-md border px-4 py-2.5 text-sm font-semibold transition ${
-                    activeGrade === grade
-                      ? 'border-maroon-800 bg-maroon-800 text-white shadow-sm'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-maroon-200 hover:bg-maroon-50 hover:text-maroon-800'
-                  }`}
-                >
-                  {grade}
-                </button>
-              ))}
+            <div className="w-full lg:max-w-sm">
+              <label htmlFor="activeGrade" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">Grade Level</label>
+              <select
+                id="activeGrade"
+                value={activeGrade}
+                onChange={(event) => setActiveGrade(event.target.value)}
+                required
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-maroon-600 focus:ring-4 focus:ring-maroon-100"
+              >
+                {gradeLevels.map((grade) => (
+                  <option key={grade} value={grade}>
+                    {grade}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </section>
@@ -229,12 +235,14 @@ const AdminLearningMaterials = () => {
                     id="materialQuarter"
                     value={quarter}
                     onChange={(event) => setQuarter(event.target.value)}
+                    required
                     className="w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-maroon-600 focus:ring-4 focus:ring-maroon-100"
                   >
-                    <option value="Quarter 1">Quarter 1</option>
-                    <option value="Quarter 2">Quarter 2</option>
-                    <option value="Quarter 3">Quarter 3</option>
-                    <option value="Quarter 4">Quarter 4</option>
+                    {quarterOptions.map((period) => (
+                      <option key={period} value={period}>
+                        {period}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -278,7 +286,7 @@ const AdminLearningMaterials = () => {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !activeGrade.trim()}
                 className="flex w-full items-center justify-center gap-2 rounded-md bg-maroon-800 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-maroon-900 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting ? <Loader2 className="animate-spin" size={20} /> : <BookOpenCheck size={18} />}

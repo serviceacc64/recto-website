@@ -40,6 +40,8 @@ const pageTitles = {
   '/resources/grade-8': 'Grade 8 Learning Materials',
   '/resources/grade-9': 'Grade 9 Learning Materials',
   '/resources/grade-10': 'Grade 10 Learning Materials',
+  '/resources/grade-11': 'Grade 11 Learning Materials',
+  '/resources/grade-12': 'Grade 12 Learning Materials',
   '/location': 'Location',
   '/research': 'Research',
   '/transparency/info': 'Transparency Information',
@@ -168,6 +170,8 @@ function App() {
           <Route path="/resources/grade-8" element={<Layout><LearningMaterials grade="Grade 8" /></Layout>} />
           <Route path="/resources/grade-9" element={<Layout><LearningMaterials grade="Grade 9" /></Layout>} />
           <Route path="/resources/grade-10" element={<Layout><LearningMaterials grade="Grade 10" /></Layout>} />
+          <Route path="/resources/grade-11" element={<Layout><LearningMaterials grade="Grade 11" /></Layout>} />
+          <Route path="/resources/grade-12" element={<Layout><LearningMaterials grade="Grade 12" /></Layout>} />
           
           <Route path="/location" element={<Layout><Location /></Layout>} />
           <Route path="/research" element={<Layout><Research /></Layout>} />

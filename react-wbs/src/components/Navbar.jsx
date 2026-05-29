@@ -33,9 +33,13 @@ const Navbar = () => {
   }, [location.pathname]);
 
   useEffect(() => {
-    setIsMenuOpen(false);
-    setActiveDropdown(null);
-    setActiveMobileSubmenu(null);
+    const timeoutId = window.setTimeout(() => {
+      setIsMenuOpen(false);
+      setActiveDropdown(null);
+      setActiveMobileSubmenu(null);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [location.pathname]);
 
   const navLinks = [
@@ -66,6 +70,8 @@ const Navbar = () => {
             { title: 'Grade 8', path: '/resources/grade-8' },
             { title: 'Grade 9', path: '/resources/grade-9' },
             { title: 'Grade 10', path: '/resources/grade-10' },
+            { title: 'Grade 11', path: '/resources/grade-11' },
+            { title: 'Grade 12', path: '/resources/grade-12' },
           ],
         },
       ],
