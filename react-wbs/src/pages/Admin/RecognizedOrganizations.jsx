@@ -16,6 +16,15 @@ import {
   FileText
 } from 'lucide-react';
 
+const GROUP_TYPE_OPTIONS = [
+  { value: 'organization', label: 'Organization' },
+  { value: 'club', label: 'Club' }
+];
+
+const getGroupTypeLabel = (type) => (
+  GROUP_TYPE_OPTIONS.find((option) => option.value === type)?.label || 'Organization'
+);
+
 const AdminRecognizedOrgs = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +33,7 @@ const AdminRecognizedOrgs = () => {
 
   // Form states
   const [orgName, setOrgName] = useState('');
+  const [orgType, setOrgType] = useState('organization');
   const [adviserName, setAdviserName] = useState('');
   const [dateEstablished, setDateEstablished] = useState('');
   const [logoFile, setLogoFile] = useState(null);
@@ -129,6 +139,7 @@ const AdminRecognizedOrgs = () => {
   const resetForm = () => {
     setEditingId(null);
     setOrgName('');
+    setOrgType('organization');
     setAdviserName('');
     setDateEstablished('');
     setLogoFile(null);
@@ -146,6 +157,7 @@ const AdminRecognizedOrgs = () => {
   const handleEdit = (record) => {
     setEditingId(record.id);
     setOrgName(record.org_name || '');
+    setOrgType(record.org_type || 'organization');
     setAdviserName(record.adviser_name || '');
     setDateEstablished(getEstablishedYear(record.date_established));
     setLogoFile(null);
@@ -165,6 +177,7 @@ const AdminRecognizedOrgs = () => {
 
       const payload = {
         org_name: orgName,
+        org_type: orgType,
         adviser_name: adviserName,
         date_established: `${dateEstablished}-01-01`
       };
@@ -206,6 +219,7 @@ const AdminRecognizedOrgs = () => {
 
   const withLogoCount = records.filter((record) => record.logo_url).length;
   const withChartCount = records.filter((record) => record.chart_url).length;
+  const clubCount = records.filter((record) => record.org_type === 'club').length;
   const selectedPdfLabel = pdfFiles.length === 0
     ? editingId
       ? 'Choose PDFs to add'
@@ -247,7 +261,7 @@ const AdminRecognizedOrgs = () => {
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+              <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-4">
                 <div className="rounded-lg border border-gray-200 bg-gray-50 p-5">
                   <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Registered Groups</span>
                   <strong className="mt-3 block text-3xl font-bold text-gray-950">{records.length}</strong>
@@ -260,6 +274,13 @@ const AdminRecognizedOrgs = () => {
                   <strong className="mt-3 block text-3xl font-bold text-maroon-950">{withLogoCount}</strong>
                   <small className="mt-2 block text-sm leading-6 text-maroon-700/80">
                     Records with uploaded identity logos for public profile cards.
+                  </small>
+                </div>
+                <div className="rounded-lg border border-gray-200 bg-white p-5">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">Clubs</span>
+                  <strong className="mt-3 block text-3xl font-bold text-gray-950">{clubCount}</strong>
+                  <small className="mt-2 block text-sm leading-6 text-gray-500">
+                    Registered groups marked as student clubs.
                   </small>
                 </div>
                 <div className="rounded-lg border border-gray-200 bg-white p-5">
@@ -310,6 +331,22 @@ const AdminRecognizedOrgs = () => {
                       placeholder="e.g. Science Research Council"
                       className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none transition focus:border-maroon-200 focus:ring-4 focus:ring-maroon-50"
                     />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">Group Type</label>
+                    <select
+                      required
+                      value={orgType}
+                      onChange={(e) => setOrgType(e.target.value)}
+                      className="w-full rounded-md border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 outline-none transition focus:border-maroon-200 focus:ring-4 focus:ring-maroon-50"
+                    >
+                      {GROUP_TYPE_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
@@ -533,9 +570,14 @@ const AdminRecognizedOrgs = () => {
                                     Established: {formatEstablishedDate(record.date_established)}
                                   </p>
                                 </div>
-                                <span className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-semibold ${record.chart_url ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                                  {record.chart_url ? 'Live' : 'Draft'}
-                                </span>
+                                <div className="flex shrink-0 flex-col items-end gap-2">
+                                  <span className="rounded-md bg-maroon-50 px-2.5 py-1 text-xs font-semibold text-maroon-800">
+                                    {getGroupTypeLabel(record.org_type)}
+                                  </span>
+                                  <span className={`rounded-md px-2.5 py-1 text-xs font-semibold ${record.chart_url ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                    {record.chart_url ? 'Live' : 'Draft'}
+                                  </span>
+                                </div>
                               </div>
 
                               <div className="mt-4 flex flex-wrap gap-3">

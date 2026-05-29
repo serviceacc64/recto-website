@@ -201,6 +201,7 @@ CREATE POLICY "Only admins can modify org structures"
 CREATE TABLE IF NOT EXISTS public."recognized-structure" (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   org_name text NOT NULL,
+  org_type text NOT NULL DEFAULT 'organization' CHECK (org_type IN ('organization', 'club')),
   date_established date,
   adviser_name text,
   logo_url text,

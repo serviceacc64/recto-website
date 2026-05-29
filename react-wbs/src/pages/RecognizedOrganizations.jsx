@@ -3,10 +3,19 @@ import { supabase } from '../lib/supabase';
 import { X, Calendar, FileText, ShieldCheck, UserRound, ArrowUpRight, Building2 } from 'lucide-react';
 import HeroWaveBackground from '../components/HeroWaveBackground';
 
+const FILTER_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'organization', label: 'Organizations' },
+  { value: 'club', label: 'Clubs' }
+];
+
+const getGroupTypeLabel = (type) => (type === 'club' ? 'Club' : 'Organization');
+
 const RecognizedOrganizations = () => {
   const [records, setRecords] = useState([]);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedType, setSelectedType] = useState('all');
 
   useEffect(() => {
     const fetchOrgs = async () => {
@@ -64,6 +73,10 @@ const RecognizedOrganizations = () => {
     if (type === 'logo') return record.logo_url || record.chart_url || record.image_url || placeholder;
     return record.chart_url || record.image_url || record.logo_url || placeholder;
   };
+
+  const filteredRecords = selectedType === 'all'
+    ? records
+    : records.filter((record) => (record.org_type || 'organization') === selectedType);
 
   return (
     <main className="min-h-screen bg-[#f7f7f5] font-outfit text-gray-950">
@@ -131,6 +144,23 @@ const RecognizedOrganizations = () => {
             </div>
           </div>
 
+          <div className="mb-8 flex flex-wrap gap-2">
+            {FILTER_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setSelectedType(option.value)}
+                className={`rounded-full px-5 py-3 text-[11px] font-bold uppercase tracking-widest transition ${
+                  selectedType === option.value
+                    ? 'bg-maroon-800 text-white shadow-sm'
+                    : 'border border-black/5 bg-white text-gray-500 hover:border-maroon-200 hover:text-maroon-800'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
           {loading ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
@@ -145,9 +175,13 @@ const RecognizedOrganizations = () => {
             <div className="rounded-[1.5rem] border border-dashed border-gray-200 bg-white py-24 text-center shadow-sm ring-1 ring-black/5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">No registered organizations found in the current cycle.</p>
             </div>
+          ) : filteredRecords.length === 0 ? (
+            <div className="rounded-[1.5rem] border border-dashed border-gray-200 bg-white py-24 text-center shadow-sm ring-1 ring-black/5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">No {selectedType === 'club' ? 'clubs' : 'organizations'} found in the current cycle.</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {records.map((record) => (
+              {filteredRecords.map((record) => (
                 <button
                   type="button"
                   key={record.id} 
@@ -165,6 +199,9 @@ const RecognizedOrganizations = () => {
                   <div className="flex flex-1 flex-col justify-between gap-6 p-6">
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-maroon-800">Recognized Group</span>
+                      <span className="mt-3 inline-flex rounded-full bg-gray-100 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">
+                        {getGroupTypeLabel(record.org_type)}
+                      </span>
                       <h3 className="mt-3 line-clamp-2 text-lg font-bold leading-tight tracking-tight text-gray-950">
                         {record.org_name}
                       </h3>
@@ -219,7 +256,12 @@ const RecognizedOrganizations = () => {
                     <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-maroon-800 text-white">
                       <ShieldCheck size={20} />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-maroon-800">Recognized Profile</span>
+                    <div>
+                      <span className="block text-[10px] font-bold uppercase tracking-[0.26em] text-maroon-800">Recognized Profile</span>
+                      <span className="mt-1 inline-flex rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-500 shadow-sm ring-1 ring-gray-100">
+                        {getGroupTypeLabel(selectedRecord.org_type)}
+                      </span>
+                    </div>
                   </div>
                   
                   <h2 className="mt-8 text-4xl font-bold leading-tight tracking-tight text-gray-950 md:text-5xl">
