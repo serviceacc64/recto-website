@@ -221,7 +221,7 @@ const AdminRecognizedOrgs = () => {
   };
 
   return (
-    <main className="admin-page mx-auto max-w-[1440px] pb-16 font-outfit text-gray-900">
+    <main className="admin-page mx-auto max-w-[1920px] pb-16 font-outfit text-gray-900">
       <div className="space-y-8">
         <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <span className="inline-flex items-center rounded-md bg-maroon-50 px-3 py-1 text-xs font-semibold text-maroon-800">
@@ -396,8 +396,13 @@ const AdminRecognizedOrgs = () => {
                     {pdfFiles.length > 0 && (
                       <div className="mt-3 grid gap-2 sm:grid-cols-2">
                         {pdfFiles.map((file, index) => (
-                          <div key={`${file.name}-${file.lastModified}-${file.size}`} className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-500">
-                            <span className="truncate">{file.name}</span>
+                          <div key={`${file.name}-${file.lastModified}-${file.size}`} className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-gray-500">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-red-50 text-red-700">
+                                <FileText size={16} />
+                              </div>
+                              <span className="truncate text-[11px] font-semibold leading-4">{file.name}</span>
+                            </div>
                             <button
                               type="button"
                               onClick={() => setPdfFiles((files) => files.filter((_, fileIndex) => fileIndex !== index))}
@@ -417,21 +422,23 @@ const AdminRecognizedOrgs = () => {
                           {currentPdfEntries.map((pdf, index) => (
                             <div
                               key={`${pdf.url}-${index}`}
-                              className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700"
+                              className="flex min-w-0 items-center justify-between gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600"
                             >
                               <a
                                 href={pdf.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex min-w-0 items-center gap-2 transition hover:text-blue-900"
+                                className="inline-flex min-w-0 items-center gap-2 transition hover:text-maroon-800"
                               >
-                                <FileText size={14} className="shrink-0" />
-                                <span className="truncate">{pdf.name}</span>
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-red-50 text-red-700">
+                                  <FileText size={16} />
+                                </div>
+                                <span className="truncate text-[11px] font-semibold leading-4">{pdf.name}</span>
                               </a>
                               <button
                                 type="button"
                                 onClick={() => setCurrentPdfEntries((entries) => entries.filter((_, entryIndex) => entryIndex !== index))}
-                                className="shrink-0 rounded-md p-1 text-blue-400 transition hover:bg-red-50 hover:text-red-700"
+                                className="shrink-0 rounded-md p-1 text-gray-400 transition hover:bg-red-50 hover:text-red-700"
                                 aria-label={`Remove ${pdf.name}`}
                               >
                                 <Trash2 size={14} />
@@ -481,10 +488,10 @@ const AdminRecognizedOrgs = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 p-6 2xl:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 p-6 md:grid-cols-2 xl:grid-cols-3">
                   {loading ? (
-                    [1, 2, 3, 4].map((item) => (
-                      <div key={item} className="h-64 animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
+                    [1, 2, 3, 4, 5].map((item) => (
+                      <div key={item} className="h-80 animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
                     ))
                   ) : records.length === 0 ? (
                     <div className="col-span-full rounded-lg border border-dashed border-gray-200 bg-gray-50 p-12 text-center">
@@ -497,9 +504,9 @@ const AdminRecognizedOrgs = () => {
                     records.map((record) => (
                       <article
                         key={record.id}
-                        className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-maroon-200 hover:shadow-md"
+                        className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-maroon-200 hover:shadow-md"
                       >
-                        <div className="flex aspect-[16/9] items-center justify-center overflow-hidden bg-gray-50">
+                        <div className="flex aspect-[16/10] items-center justify-center overflow-hidden bg-gray-50">
                           {record.chart_url ? (
                             <img
                               src={record.chart_url}
@@ -516,9 +523,9 @@ const AdminRecognizedOrgs = () => {
                           )}
                         </div>
 
-                        <div className="border-t border-gray-100 p-5">
-                          <div className="flex items-start gap-4">
-                            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md border border-gray-200 bg-gray-50 p-3">
+                        <div className="flex flex-1 flex-col border-t border-gray-100 p-4">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md border border-gray-200 bg-gray-50 p-2.5">
                               {record.logo_url ? (
                                 <img src={record.logo_url} className="h-full w-full object-contain" alt={`${record.org_name} logo`} />
                               ) : (
@@ -528,7 +535,7 @@ const AdminRecognizedOrgs = () => {
                             <div className="min-w-0 flex-1">
                               <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                  <h3 className="truncate text-lg font-bold text-gray-950">{record.org_name}</h3>
+                                  <h3 className="truncate text-base font-bold text-gray-950">{record.org_name}</h3>
                                   <p className="mt-1 text-sm text-gray-500">
                                     Established: {formatEstablishedDate(record.date_established)}
                                   </p>
@@ -538,36 +545,45 @@ const AdminRecognizedOrgs = () => {
                                 </span>
                               </div>
 
-                              <div className="mt-4 flex flex-wrap gap-3">
-                                <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-500">
-                                  <UserCheck size={14} className="text-maroon-800" />
-                                  {record.adviser_name}
+                              <div className="mt-4 space-y-3">
+                                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                  <div className="flex min-w-0 items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600">
+                                    <UserCheck size={14} className="shrink-0 text-maroon-800" />
+                                    <span className="truncate">{record.adviser_name || 'No adviser'}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-600">
+                                    <Calendar size={14} className="shrink-0 text-maroon-800" />
+                                    <span>{formatEstablishedDate(record.date_established)}</span>
+                                  </div>
                                 </div>
-                                <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-500">
-                                  <Calendar size={14} className="text-maroon-800" />
-                                  {formatEstablishedDate(record.date_established)}
-                                </div>
-                                {getPdfEntries(record).map((pdf, index) => (
-                                  <a
-                                    key={`${pdf.url}-${index}`}
-                                    href={pdf.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex max-w-full items-center gap-2 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
-                                  >
-                                    <FileText size={14} className="shrink-0" />
-                                    <span className="truncate">{pdf.name}</span>
-                                  </a>
-                                ))}
                               </div>
                             </div>
                           </div>
 
-                          <div className="mt-5 flex flex-wrap justify-end gap-2">
+                          {getPdfEntries(record).length > 0 && (
+                            <div className="mt-4 space-y-2">
+                              {getPdfEntries(record).map((pdf, index) => (
+                                <a
+                                  key={`${pdf.url}-${index}`}
+                                  href={pdf.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex min-w-0 items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-gray-600 transition hover:border-maroon-200 hover:bg-maroon-50 hover:text-maroon-800"
+                                >
+                                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-red-50 text-red-700">
+                                    <FileText size={16} />
+                                  </div>
+                                  <span className="truncate text-[11px] font-semibold leading-4">{pdf.name}</span>
+                                </a>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="mt-auto grid grid-cols-2 gap-2 border-t border-gray-100 pt-4">
                             <button
                               type="button"
                               onClick={() => handleEdit(record)}
-                              className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-500 transition hover:border-maroon-200 hover:bg-maroon-50 hover:text-maroon-800"
+                              className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-200 px-3 py-2.5 text-sm font-semibold text-gray-600 transition hover:border-maroon-200 hover:bg-maroon-50 hover:text-maroon-800"
                               aria-label={`Edit ${record.org_name}`}
                             >
                               <Pencil size={16} />
@@ -576,7 +592,7 @@ const AdminRecognizedOrgs = () => {
                             <button
                               type="button"
                               onClick={() => handleDelete(record.id)}
-                              className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                              className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-200 px-3 py-2.5 text-sm font-semibold text-gray-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
                               aria-label={`Delete ${record.org_name}`}
                             >
                               <Trash2 size={16} />

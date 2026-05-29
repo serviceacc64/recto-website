@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { ArrowUpRight, BookOpen, Calendar, ChevronLeft, ChevronRight, Database, FileText, Filter, GraduationCap, School, Search, Sparkles } from 'lucide-react';
+import { BookOpen, Calendar, ChevronLeft, ChevronRight, Database, Eye, FileText, Filter, GraduationCap, School, Search, Sparkles, X } from 'lucide-react';
 import HeroWaveBackground from '../components/HeroWaveBackground';
 
 const Research = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRecord, setSelectedRecord] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [titleFilter, setTitleFilter] = useState('');
   const [gradeFilter, setGradeFilter] = useState('');
@@ -34,6 +35,20 @@ const Research = () => {
 
     fetchResearch();
   }, []);
+
+  useEffect(() => {
+    if (!selectedRecord) return undefined;
+
+    const preventRestrictedShortcuts = (event) => {
+      const key = event.key.toLowerCase();
+      if ((event.ctrlKey || event.metaKey) && ['p', 's'].includes(key)) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', preventRestrictedShortcuts);
+    return () => window.removeEventListener('keydown', preventRestrictedShortcuts);
+  }, [selectedRecord]);
 
   const filteredRecords = useMemo(() => {
     let result = records;
@@ -73,6 +88,12 @@ const Research = () => {
     setYearFilter('');
     setCategoryFilter('');
     setCurrentPage(1);
+  };
+
+  const getViewOnlyPdfUrl = (url) => {
+    if (!url) return '';
+    const separator = url.includes('#') ? '&' : '#';
+    return `${url}${separator}toolbar=0&navpanes=0&scrollbar=1&view=FitH`;
   };
 
   return (
@@ -247,11 +268,14 @@ const Research = () => {
 
                           <div className="mt-8 flex flex-col justify-between gap-4 border-t border-gray-100 pt-5 md:flex-row md:items-center">
                             {record.file ? (
-                              <a href={record.file} target="_blank" rel="noopener noreferrer" className="inline-flex w-fit items-center gap-3 rounded-full bg-gray-950 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-800">
-                                <FileText size={16} />
-                                Open Full Archive
-                                <ArrowUpRight size={14} />
-                              </a>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedRecord(record)}
+                                className="inline-flex w-fit items-center gap-3 rounded-full bg-gray-950 px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white transition-all hover:bg-maroon-800"
+                              >
+                                <Eye size={16} />
+                                View File
+                              </button>
                             ) : (
                               <span className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
                                 <Database size={16} />
@@ -283,6 +307,43 @@ const Research = () => {
           </div>
         </div>
       </section>
+
+      {selectedRecord?.file && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-gray-950/85 p-4 backdrop-blur-xl animate-in fade-in duration-300 md:p-6"
+          onClick={() => setSelectedRecord(null)}
+          onContextMenu={(event) => event.preventDefault()}
+        >
+          <div
+            className="relative flex h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-[1.5rem] bg-white shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-6 duration-300"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-4 border-b border-gray-100 px-5 py-4 md:px-6">
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-maroon-800">View Only</p>
+                <h2 className="mt-1 truncate text-base font-bold text-gray-950 md:text-lg">{selectedRecord.title}</h2>
+              </div>
+              <button
+                type="button"
+                aria-label="Close research file viewer"
+                onClick={() => setSelectedRecord(null)}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:bg-gray-50 hover:text-maroon-800"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            <div className="relative min-h-0 flex-1 bg-gray-100">
+              <iframe
+                src={getViewOnlyPdfUrl(selectedRecord.file)}
+                title={`${selectedRecord.title} view only file`}
+                className="h-full w-full select-none"
+                onContextMenu={(event) => event.preventDefault()}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

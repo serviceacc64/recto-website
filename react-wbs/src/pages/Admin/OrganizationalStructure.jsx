@@ -16,6 +16,7 @@ const departments = [
   { id: 'Filipino', name: 'Filipino' },
   { id: 'MAPEH', name: 'MAPEH' },
   { id: 'Math', name: 'Math' },
+  { id: 'SNED', name: 'SNED' },
   { id: 'TLE', name: 'TLE' },
   { id: 'Values Education', name: 'Values Education' },
   { id: 'Science', name: 'Science' },

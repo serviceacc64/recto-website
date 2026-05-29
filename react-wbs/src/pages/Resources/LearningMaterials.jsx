@@ -19,10 +19,17 @@ const SUBJECT_ICON_MAP = {
   'VALUES EDUCATION': <Heart size={20} />,
 };
 
+const normalizeLabel = (value) => String(value || '').trim().replace(/\s+/g, ' ').toLowerCase();
+const getQuarterSortValue = (quarter) => {
+  const match = String(quarter || '').match(/\d+/);
+  return match ? Number(match[0]) : Number.MAX_SAFE_INTEGER;
+};
+
 const LearningMaterials = ({ grade }) => {
   const [records, setRecords] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeSubject, setActiveSubject] = useState(null);
+  const [activeQuarter, setActiveQuarter] = useState('all');
 
   useEffect(() => {
     const fetchMaterials = async () => {
@@ -31,14 +38,16 @@ const LearningMaterials = ({ grade }) => {
         const { data, error } = await supabase
           .from('learning_materials')
           .select('*')
-          .eq('grade', grade)
           .order('subject', { ascending: true })
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
-        const grouped = (data || []).reduce((acc, curr) => {
-          const subject = curr.subject.toUpperCase();
+        const gradeKey = normalizeLabel(grade);
+        const matchingMaterials = (data || []).filter((material) => normalizeLabel(material.grade) === gradeKey);
+
+        const grouped = matchingMaterials.reduce((acc, curr) => {
+          const subject = curr.subject?.trim().toUpperCase() || 'UNCATEGORIZED';
           if (!acc[subject]) acc[subject] = [];
           acc[subject].push(curr);
           return acc;
@@ -47,6 +56,7 @@ const LearningMaterials = ({ grade }) => {
         setRecords(grouped);
         const subjects = Object.keys(grouped);
         setActiveSubject(subjects[0] || null);
+        setActiveQuarter('all');
       } catch (err) {
         console.error('Error fetching learning materials:', err);
       } finally {
@@ -58,7 +68,13 @@ const LearningMaterials = ({ grade }) => {
   }, [grade]);
 
   const subjects = Object.keys(records);
-  const activeFiles = records[activeSubject] || [];
+  const allFiles = Object.values(records).flat();
+  const quarterOptions = [...new Set(allFiles.map((file) => file.quarter).filter(Boolean))]
+    .sort((a, b) => getQuarterSortValue(a) - getQuarterSortValue(b) || a.localeCompare(b));
+  const subjectFiles = records[activeSubject] || [];
+  const activeFiles = activeQuarter === 'all'
+    ? subjectFiles
+    : subjectFiles.filter((file) => normalizeLabel(file.quarter) === normalizeLabel(activeQuarter));
 
   return (
     <main className="min-h-screen bg-[#f7f7f5] font-outfit text-gray-950">
@@ -173,16 +189,54 @@ const LearningMaterials = ({ grade }) => {
               </aside>
 
               <section className="lg:col-span-3">
-                <div className="mb-5 flex flex-col justify-between gap-3 rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-black/5 md:flex-row md:items-center">
-                  <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                    <span className="h-2 w-2 rounded-full bg-maroon-800"></span>
-                    Viewing {activeSubject}
+                <div className="mb-5 space-y-4 rounded-[1.5rem] bg-white p-5 shadow-sm ring-1 ring-black/5">
+                  <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+                    <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                      <span className="h-2 w-2 rounded-full bg-maroon-800"></span>
+                      Viewing {activeSubject}
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{activeFiles.length} Assets Found</span>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{activeFiles.length} Assets Found</span>
+
+                  {quarterOptions.length > 0 && (
+                    <div className="flex flex-wrap gap-2 border-t border-gray-100 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setActiveQuarter('all')}
+                        className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition ${
+                          activeQuarter === 'all'
+                            ? 'bg-maroon-800 text-white'
+                            : 'border border-gray-100 bg-[#fbfbfa] text-gray-500 hover:border-maroon-200 hover:text-maroon-800'
+                        }`}
+                      >
+                        All Quarters
+                      </button>
+                      {quarterOptions.map((quarter) => (
+                        <button
+                          key={quarter}
+                          type="button"
+                          onClick={() => setActiveQuarter(quarter)}
+                          className={`rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition ${
+                            activeQuarter === quarter
+                              ? 'bg-maroon-800 text-white'
+                              : 'border border-gray-100 bg-[#fbfbfa] text-gray-500 hover:border-maroon-200 hover:text-maroon-800'
+                          }`}
+                        >
+                          {quarter}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  {activeFiles.map((file) => (
+                {activeFiles.length === 0 ? (
+                  <div className="rounded-[1.5rem] border border-dashed border-gray-200 bg-white py-20 text-center shadow-sm ring-1 ring-black/5">
+                    <Folder size={36} className="mx-auto mb-4 text-gray-300" />
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">No files found for this quarter.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    {activeFiles.map((file) => (
                     <a
                       key={file.id}
                       href={file.file_url}
@@ -213,8 +267,9 @@ const LearningMaterials = ({ grade }) => {
                         </span>
                       </div>
                     </a>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </section>
             </div>
           )}

@@ -31,20 +31,21 @@ const Footer = () => {
                   label: 'Facebook'
                 },
                 { 
+                  icon: <svg size={18} viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px]"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>, 
+                  color: 'bg-blue-50 text-blue-600 ring-blue-100 hover:bg-blue-600 hover:text-white hover:shadow-blue-200',
+                  href: 'https://www.facebook.com/depedtayo',
+                  label: 'DepEd Tayo Facebook'
+                },
+                { 
                   icon: <svg size={18} viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px]"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.42a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.42 8.6.42 8.6.42s6.88 0 8.6-.42a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><path fill="white" d="M9.75 15.02V8.48l5.75 3.27-5.75 3.27z"></path></svg>, 
                   color: 'bg-red-50 text-red-600 ring-red-100 hover:bg-red-600 hover:text-white hover:shadow-red-200',
                   href: 'https://www.youtube.com/@TheRectorianPress',
                   label: 'YouTube'
                 },
                 { 
-                  icon: <svg size={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>, 
-                  color: 'bg-pink-50 text-pink-600 ring-pink-100 hover:bg-gradient-to-br hover:from-pink-500 hover:to-orange-400 hover:text-white hover:shadow-pink-200',
-                  label: 'Instagram'
-                },
-                { 
-                  icon: <svg size={18} viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px]"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>, 
-                  color: 'bg-sky-50 text-sky-500 ring-sky-100 hover:bg-sky-500 hover:text-white hover:shadow-sky-200',
-                  label: 'Twitter'
+                  icon: <svg size={18} viewBox="0 0 24 24" fill="currentColor" className="w-[18px] h-[18px]"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.38 6.38 0 0 0-5.76 10.3 6.34 6.34 0 0 0 10.86-4.43V8.31a8.16 8.16 0 0 0 4.77 1.52V6.41a4.85 4.85 0 0 1-.64.28z"></path></svg>, 
+                  color: 'bg-gray-50 text-gray-950 ring-gray-100 hover:bg-gray-950 hover:text-white hover:shadow-gray-200',
+                  label: 'TikTok'
                 }
               ].map((social, i) => (
                 <a

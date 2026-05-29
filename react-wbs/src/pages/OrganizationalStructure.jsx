@@ -12,6 +12,7 @@ import filipino from '../assets/imgs/filipino.jpg';
 import ap from '../assets/imgs/ap.jpg';
 import mapeh from '../assets/imgs/mapeh.png';
 import esp from '../assets/imgs/esp.png';
+import sned from '../assets/imgs/sned (1).png';
 
 const departments = [
   { id: 'TLE', name: 'TLE DEPARTMENT', image: tle },
@@ -22,6 +23,7 @@ const departments = [
   { id: 'AP', name: 'AP DEPARTMENT', image: ap },
   { id: 'MAPEH', name: 'MAPEH DEPARTMENT', image: mapeh },
   { id: 'Values Education', name: 'VALUES EDUCATION DEPARTMENT', image: esp },
+  { id: 'SNED', name: 'SNED DEPARTMENT', image: sned },
 ];
 
 const OrganizationalStructure = () => {
